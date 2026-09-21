@@ -1,859 +1,2084 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Final Exam Lab — ห้องซ้อมสอบปลายภาค 📚</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#5EC8F2" />
+<title>Mini Farm Island 3D 🌾</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
 <style>
   *, *::before, *::after { box-sizing: border-box; }
-  :root {
-    --bg-main: #f0f4f8;
-    --bg-card: rgba(255, 255, 255, 0.85);
-    --bg-glass: rgba(255, 255, 255, 0.65);
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --brand-blue: #0284c7;
-    --brand-blue-hover: #0369a1;
-    --brand-teal: #0d9488;
-    --brand-green: #16a34a;
-    --brand-red: #e11d48;
-    --brand-purple: #7c3aed;
-    --line: rgba(226, 232, 240, 0.8);
-    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
-    --shadow-lg: 0 20px 30px -10px rgba(0, 0, 0, 0.12);
-  }
-
   html, body {
     margin: 0; padding: 0; width: 100%; height: 100%;
-    background: #e0f2fe;
-    color: var(--text-primary);
+    overflow: hidden; background: #5EC8F2;
     font-family: 'Kanit', system-ui, -apple-system, sans-serif;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior: none;
-    overflow-x: hidden;
   }
-
-  canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  canvas { display: block; touch-action: none; }
 
   /* ============ LAYOUT ============ */
   #ui {
-    position: relative; z-index: 10;
-    max-width: 1100px; margin: 0 auto;
-    padding: clamp(12px, 2.5vw, 24px);
-    display: flex; flex-direction: column; gap: 16px;
-    min-height: 100vh;
+    position: fixed; inset: 0; z-index: 10;
+    pointer-events: none;
+    padding: clamp(10px, 1.6vw, 20px);
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 12px;
   }
+  #ui > * { pointer-events: auto; }
   .hidden { display: none !important; }
 
   /* ============ GLASS PANEL ============ */
   .panel {
-    background: var(--bg-card);
-    -webkit-backdrop-filter: blur(16px) saturate(1.8);
-    backdrop-filter: blur(16px) saturate(1.8);
-    border: 1.5px solid rgba(255, 255, 255, 0.9);
-    border-radius: 24px;
-    box-shadow: var(--shadow-md);
-    color: var(--text-primary);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: rgba(255,255,255,.58);
+    -webkit-backdrop-filter: blur(16px) saturate(1.5);
+    backdrop-filter: blur(16px) saturate(1.5);
+    border: 1.5px solid rgba(255,255,255,.75);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(12,60,92,.20), inset 0 1px 0 rgba(255,255,255,.6);
+    color: #14323f;
   }
 
-  /* ============ HEADER & HERO ============ */
-  .hero-header {
-    padding: 20px 24px;
-    display: flex; flex-direction: column; gap: 8px;
-    position: relative; overflow: hidden;
+  /* ============ HUD (left) ============ */
+  #hudCol { display: flex; flex-direction: column; gap: 8px; width: clamp(206px, 20.5vw, 256px); max-height: calc(100dvh - 2*clamp(10px,1.6vw,20px)); }
+  #hud { padding: 13px; display: flex; flex-direction: column; gap: 9px; overflow-y: auto; }
+  #hud h1 {
+    margin: 0; font-size: clamp(14px, 1.3vw, 17px); font-weight: 700;
+    display: flex; align-items: center; gap: 7px; color: #10404f; letter-spacing: .2px;
   }
-  .hero-header::before {
-    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle at 80% 20%, rgba(186, 230, 253, 0.4) 0%, transparent 50%);
-    pointer-events: none;
+  #whoami { font-size: 11px; font-weight: 300; color: #5f8695; margin-top: -6px; }
+
+  /* level + exp */
+  .lvRow { display: flex; align-items: center; gap: 10px; }
+  #lvBadge {
+    width: 36px; height: 36px; flex: 0 0 36px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 12.5px; font-weight: 700; color: #fff;
+    background: linear-gradient(160deg,#6FC7F5,#2E8FD8); box-shadow: 0 3px 9px rgba(46,143,216,.42);
   }
-  .pill {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 4px 12px; border-radius: 999px;
-    background: #e0f2fe; color: var(--brand-blue);
-    font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
-    width: fit-content; border: 1px solid #bae6fd;
-  }
-  .hero-header h1 {
-    margin: 0; font-size: clamp(24px, 4vw, 36px); font-weight: 700; color: #0f172a;
+  .lvMeta { flex: 1; min-width: 0; }
+  .lvTop { display: flex; justify-content: space-between; font-size: 10.5px; color: #5f8695; margin-bottom: 3px; }
+  .bar { width: 100%; height: 8px; background: rgba(160,190,205,.45); border-radius: 5px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; width: 0%; border-radius: 5px; background: linear-gradient(90deg,#5EC8F2,#2E8FD8); transition: width .3s; }
+
+  .stat {
     display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.66); border: 1px solid rgba(255,255,255,.8);
+    border-radius: 14px; padding: 7px 10px;
   }
-  .hero-header p { margin: 0; color: var(--text-secondary); font-size: 14px; font-weight: 300; }
+  .stat .ico {
+    width: 30px; height: 30px; flex: 0 0 30px; border-radius: 10px;
+    display: grid; place-items: center; font-size: 16px;
+    background: linear-gradient(160deg,#FFD98A,#F5A623); box-shadow: 0 3px 8px rgba(245,166,35,.35);
+  }
+  .stat.box .ico { background: linear-gradient(160deg,#F2C08A,#D98E4F); box-shadow: 0 3px 8px rgba(217,142,79,.35); }
+  .stat .lbl { font-size: 11px; font-weight: 300; color: #517784; line-height: 1.15; }
+  .stat .val { font-size: 16px; font-weight: 700; color: #10404f; line-height: 1.2; }
 
-  /* ============ STATS HUD ============ */
-  .hud-row {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;
+  .btn {
+    font-family: inherit; width: 100%; border: none; cursor: pointer;
+    padding: 10px; border-radius: 13px; font-size: 13.5px; font-weight: 600;
+    color: #fff; background: linear-gradient(160deg,#5ED18B,#2FA463);
+    box-shadow: 0 4px 12px rgba(47,164,99,.35); transition: transform .12s, filter .12s;
   }
-  .stat-card {
-    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.7); border-radius: 18px;
-    border: 1px solid rgba(255, 255, 255, 0.8);
-  }
-  .stat-card .ico {
-    width: 42px; height: 42px; border-radius: 14px;
-    display: grid; place-items: center; font-size: 20px;
-    background: linear-gradient(135deg, #bae6fd, #0284c7); color: #fff;
-    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25); flex-shrink: 0;
-  }
-  .stat-card.green .ico {
-    background: linear-gradient(135deg, #bbf7d0, #16a34a);
-    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
-  }
-  .stat-card.purple .ico {
-    background: linear-gradient(135deg, #ddd6fe, #7c3aed);
-    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.25);
-  }
-  .stat-lbl { font-size: 11px; color: var(--text-secondary); font-weight: 400; }
-  .stat-val { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+  .btn:hover:not(:disabled) { transform: translateY(-1.5px); filter: brightness(1.06); }
+  .btn:active:not(:disabled) { transform: translateY(1px) scale(.985); }
+  .btn:disabled { background: rgba(190,205,212,.65); color: #7e97a1; box-shadow: none; cursor: not-allowed; }
+  .btn.sm { padding: 8px; font-size: 12px; border-radius: 11px; }
+  .btn.blue { background: linear-gradient(160deg,#6FC7F5,#2E8FD8); box-shadow: 0 4px 12px rgba(46,143,216,.35); }
+  .btn.violet { background: linear-gradient(160deg,#B48CF0,#7A4BD1); box-shadow: 0 4px 12px rgba(122,75,209,.35); }
+  .btn.red { background: linear-gradient(160deg,#FF8A7A,#E24B37); box-shadow: 0 4px 12px rgba(226,75,55,.35); }
+  #earnLine { text-align: center; font-size: 11px; font-weight: 400; color: #2FA463; }
+  .btnRow { display: flex; gap: 6px; }
 
-  /* ============ NAVIGATION TABS ============ */
-  .nav-tabs {
-    display: flex; gap: 10px; padding: 6px;
-    background: rgba(255, 255, 255, 0.75);
-    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
-    border-radius: 18px; border: 1.5px solid rgba(255, 255, 255, 0.9);
-    position: sticky; top: 12px; z-index: 20; box-shadow: var(--shadow-sm);
+  /* ============ WATER DROPS ============ */
+  #waterPanel { padding: 9px 11px; display: flex; align-items: center; gap: 9px; cursor: pointer; }
+  #waterPanel .wlbl { font-size: 11px; font-weight: 300; color: #517784; line-height: 1.15; }
+  #waterPanel .wval { font-size: 14px; font-weight: 700; color: #10404f; }
+  #dropRow { display: flex; gap: 3px; margin-top: 3px; }
+  .drop { font-size: 15px; filter: grayscale(1) opacity(.35); transition: filter .2s, transform .2s; }
+  .drop.on { filter: none; transform: scale(1.1); }
+
+  /* ============ SHOP (right) ============ */
+  #shop { width: clamp(232px, 23vw, 296px); padding: 8px; display: flex; flex-direction: column; min-height: 0; max-height: calc(100dvh - 2*clamp(10px,1.6vw,20px)); }
+  .tabs { display: flex; gap: 4px; padding: 3px; margin-bottom: 8px; border-bottom: 1.5px solid rgba(255,255,255,.7); }
+  .tab {
+    font-family: inherit; flex: 1; border: none; background: transparent; cursor: pointer;
+    padding: 8px 4px 10px; font-size: 13px; font-weight: 500; color: #6d909d;
+    border-bottom: 3px solid transparent; margin-bottom: -4.5px; transition: color .15s, border-color .15s;
+    white-space: nowrap;
   }
-  .tab-btn {
-    flex: 1; border: none; background: transparent; padding: 10px 16px;
-    border-radius: 13px; font-size: 14px; font-weight: 500; color: var(--text-secondary);
-    cursor: pointer; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    font-family: inherit;
+  .tab.active { color: #1f9d6a; border-bottom-color: #35B77E; font-weight: 600; }
+  .tab-body { overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: 7px; padding: 3px; scrollbar-width: thin; }
+  .tab-body::-webkit-scrollbar { width: 5px; }
+  .tab-body::-webkit-scrollbar-thumb { background: rgba(80,130,150,.3); border-radius: 4px; }
+
+  .card {
+    text-align: left; font-family: inherit; cursor: pointer; width: 100%;
+    background: rgba(255,255,255,.72); border: 2px solid rgba(255,255,255,.85);
+    border-radius: 14px; padding: 8px 10px; transition: transform .12s, border-color .15s, background .15s, box-shadow .15s;
   }
-  .tab-btn:hover { color: var(--brand-blue); background: rgba(224, 242, 254, 0.5); }
-  .tab-btn.active {
-    background: #ffffff; color: var(--brand-blue); font-weight: 600;
-    box-shadow: var(--shadow-sm); transform: scale(1.02);
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(20,70,95,.14); }
+  .card:active { transform: translateY(0) scale(.985); }
+  .card.selected { border-color: #35B77E; background: rgba(226,250,238,.9); box-shadow: 0 4px 14px rgba(53,183,126,.28); }
+  .card.dim { opacity: .55; }
+  .card.dim:hover { transform: none; box-shadow: none; }
+  .row1 { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
+  .cname { font-size: 13.5px; font-weight: 600; color: #17414f; white-space: nowrap; }
+  .csell { font-size: 11.5px; font-weight: 500; color: #E08A1E; white-space: nowrap; }
+  .row2 { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; margin-top: 1px; }
+  .ccost { font-size: 11.5px; font-weight: 400; color: #3fa06f; }
+  .cmeta { font-size: 10.5px; font-weight: 300; color: #7d9aa5; white-space: nowrap; }
+  .cexp { font-size: 10.5px; font-weight: 500; color: #2E8FD8; }
+  .card.build .ccost { color: #C25B4E; }
+  .cdesc { font-size: 10.5px; font-weight: 300; color: #6c8d99; margin-top: 2px; line-height: 1.35; }
+  .shopHead { font-size: 11px; font-weight: 500; color: #6d909d; padding: 8px 4px 2px; border-bottom: 1px solid rgba(255,255,255,.8); }
+
+  /* ============ HINT + GUIDE ============ */
+  #hint {
+    position: fixed; left: 50%; bottom: clamp(10px, 2.2vh, 22px); transform: translateX(-50%);
+    z-index: 10; pointer-events: none;
+    background: rgba(255,255,255,.6);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    border: 1.5px solid rgba(255,255,255,.75); border-radius: 18px;
+    padding: 8px 20px; font-size: clamp(10.5px, 1vw, 13px); font-weight: 400; color: #1c4a59;
+    box-shadow: 0 8px 22px rgba(12,60,92,.18); text-align: center; line-height: 1.6;
+  }
+  #hint b { color: #2FA463; font-weight: 600; }
+  #hint i { color: #E08A1E; font-weight: 600; font-style: normal; }
+  #hint u { color: #2E8FD8; font-weight: 600; text-decoration: none; }
+
+  #btnGuide {
+    position: fixed; top: clamp(10px,1.6vw,20px); left: 50%; transform: translateX(-50%);
+    z-index: 12; font-family: inherit; cursor: pointer; white-space: nowrap;
+    background: rgba(255,255,255,.68); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    border: 1.5px solid rgba(255,255,255,.8); border-radius: 999px;
+    padding: 8px 18px; font-size: 13px; font-weight: 600; color: #1c4a59;
+    box-shadow: 0 6px 18px rgba(12,60,92,.18);
   }
 
-  /* ============ SUBJECT & TOPIC GRIDS ============ */
-  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+  /* ============ ROBOT LABEL ============ */
+  #robotLabel {
+    position: fixed; z-index: 9; pointer-events: auto; cursor: pointer;
+    transform: translate(-50%, -100%); transition: opacity .2s;
+    padding: 4px 11px; border-radius: 10px; white-space: nowrap;
+    font-size: 13px; font-weight: 700; letter-spacing: .3px;
+    background: #FFE45C; color: #4a3400; border: 2.5px solid #2b2317;
+    box-shadow: 0 4px 0 #2b2317, 0 8px 14px rgba(0,0,0,.22);
+    user-select: none;
+  }
+  #robotLabel.water { background: #7FD8FF; color: #063a52; border-color: #0d3d52; box-shadow: 0 4px 0 #0d3d52, 0 8px 14px rgba(0,0,0,.22); }
+  #robotLabel.broken { background: #FF7A6B; color: #4a0d05; border-color: #571109; box-shadow: 0 4px 0 #571109, 0 8px 14px rgba(0,0,0,.22); animation: shakeLbl .28s infinite; }
+  @keyframes shakeLbl { 0%,100%{transform:translate(-50%,-100%) rotate(-1.6deg);} 50%{transform:translate(-50%,-100%) rotate(1.6deg);} }
 
-  .subject-card {
-    padding: 22px; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.9);
-    background: rgba(255, 255, 255, 0.8);
-    cursor: pointer; text-align: left; transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-sm);
+  /* ============ FLOATING TEXT / LEVEL UP ============ */
+  #fx { position: fixed; inset: 0; z-index: 20; pointer-events: none; overflow: hidden; }
+  .ftext {
+    position: absolute; transform: translate(-50%,-50%);
+    font-size: 19px; font-weight: 700; white-space: nowrap;
+    text-shadow: 0 2px 0 rgba(255,255,255,.85), 0 0 12px rgba(255,255,255,.7);
+    animation: floatUp 1.35s cubic-bezier(.18,.7,.32,1) forwards;
   }
-  .subject-card:hover {
-    transform: translateY(-4px); background: #ffffff;
-    box-shadow: var(--shadow-lg); border-color: #bae6fd;
-  }
-  .subject-icon {
-    width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center;
-    font-size: 28px; background: #f0f9ff; border: 1px solid #e0f2fe; flex-shrink: 0;
-  }
-  .subject-info b { font-size: 18px; color: var(--text-primary); display: block; margin-bottom: 2px; }
-  .subject-info small { font-size: 12px; color: var(--text-secondary); font-weight: 300; }
-
-  .topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 14px; }
-  .topic-card {
-    padding: 14px 16px; border-radius: 16px; border: 1.5px solid rgba(255,255,255,0.8);
-    background: rgba(255, 255, 255, 0.7); cursor: pointer; text-align: left;
-    transition: all 0.2s ease; display: flex; flex-direction: column; gap: 4px;
-    font-family: inherit;
-  }
-  .topic-card:hover {
-    transform: translateY(-2px); background: #ffffff; border-color: #0284c7;
-    box-shadow: var(--shadow-md);
-  }
-  .topic-card b { font-size: 15px; color: var(--text-primary); }
-  .topic-card small { font-size: 12px; color: var(--text-secondary); }
-
-  /* ============ CONTENT & FORMULAS ============ */
-  .view-container { padding: 24px; }
-  .btn-back {
-    border: none; background: #e0f2fe; color: var(--brand-blue);
-    padding: 8px 16px; border-radius: 12px; font-weight: 600; font-size: 13px;
-    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
-    margin-bottom: 16px; transition: all 0.2s; font-family: inherit;
-  }
-  .btn-back:hover { background: #bae6fd; transform: translateX(-2px); }
-
-  .formula-box {
-    font-size: 18px; font-weight: 600; color: #0284c7;
-    background: #f0f9ff; border: 1.5px dashed #7dd3fc; border-radius: 16px;
-    padding: 16px; text-align: center; margin: 14px 0;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-  }
-  .diagram-box {
-    display: flex; justify-content: center; align-items: center; min-height: 120px;
-    background: #f8fafc; border: 1px solid var(--line); border-radius: 16px;
-    margin: 14px 0; font-size: 48px; gap: 12px;
-  }
-  .step-box {
-    border-left: 4px solid var(--brand-blue); padding: 12px 16px; margin: 10px 0;
-    background: #f0f9ff; border-radius: 0 12px 12px 0; font-size: 14px;
-  }
-  .example-box {
-    background: #f8fafc; border: 1px solid var(--line); padding: 14px;
-    border-radius: 14px; margin: 12px 0; font-size: 14px;
-  }
-  .answer-text { color: var(--brand-green); font-weight: 700; }
-
-  .mini-quiz-grid { display: grid; gap: 8px; margin-top: 12px; }
-  .mini-btn {
-    padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--line);
-    background: #ffffff; color: var(--text-primary); text-align: left; cursor: pointer;
-    font-size: 13.5px; transition: all 0.2s; font-family: inherit; font-weight: 400;
-  }
-  .mini-btn:hover { border-color: var(--brand-blue); background: #f0f9ff; }
-
-  /* ============ QUIZ SYSTEM ============ */
-  .quiz-card {
-    background: #ffffff; border-radius: 18px; border: 1.5px solid var(--line);
-    padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-sm);
-    transition: transform 0.2s;
-  }
-  .quiz-card p { font-size: 16.5px; font-weight: 600; margin: 8px 0 14px; color: var(--text-primary); }
-  .opt-btn {
-    display: block; width: 100%; text-align: left; margin: 8px 0; padding: 12px 16px;
-    border-radius: 12px; border: 1.5px solid var(--line); background: #f8fafc;
-    color: var(--text-primary); font-size: 14.5px; cursor: pointer;
-    transition: all 0.15s ease; font-family: inherit;
-  }
-  .opt-btn:hover:not(:disabled) { border-color: var(--brand-blue); background: #f0f9ff; transform: translateX(2px); }
-  .opt-btn.correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #15803d !important; font-weight: 600; }
-  .opt-btn.wrong { background: #ffe4e6 !important; border-color: #f43f5e !important; color: #be123c !important; }
-  .explain-text { font-size: 13px; color: var(--text-secondary); margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line); }
-
-  .btn-primary {
-    font-family: inherit; border: none; cursor: pointer; width: 100%;
-    padding: 14px; border-radius: 14px; font-size: 16px; font-weight: 600;
-    color: #fff; background: linear-gradient(135deg, #0284c7, #0369a1);
-    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); transition: all 0.2s;
-  }
-  .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.05); }
-  .btn-primary:active { transform: translateY(0); }
-
-  /* ============ FLOATING FX & ANIMATIONS ============ */
-  #fx-layer { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
-  .floating-spark {
-    position: absolute; font-weight: 700; font-size: 20px;
-    animation: floatUp 1.2s cubic-bezier(0.18, 0.7, 0.32, 1) forwards;
-  }
+  .ftext.big { font-size: 24px; }
   @keyframes floatUp {
-    0% { opacity: 0; transform: translate(-50%, 0) scale(0.5); }
-    20% { opacity: 1; transform: translate(-50%, -20px) scale(1.2); }
-    100% { opacity: 0; transform: translate(-50%, -80px) scale(0.9); }
+    0%   { opacity: 0; transform: translate(-50%,-50%) scale(.5); }
+    18%  { opacity: 1; transform: translate(-50%,-64%) scale(1.18); }
+    32%  { transform: translate(-50%,-72%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%,-160%) scale(.95); }
+  }
+  .levelup {
+    position: absolute; left: 50%; top: 38%; transform: translate(-50%,-50%);
+    font-size: clamp(34px, 8vw, 62px); font-weight: 700; color: #fff; white-space: nowrap;
+    text-shadow: 0 4px 0 #2E8FD8, 0 8px 26px rgba(46,143,216,.7);
+    animation: lvpop 1.9s cubic-bezier(.2,1.4,.4,1) forwards;
+  }
+  @keyframes lvpop {
+    0% { opacity: 0; transform: translate(-50%,-50%) scale(.3) rotate(-8deg); }
+    22% { opacity: 1; transform: translate(-50%,-50%) scale(1.15) rotate(2deg); }
+    38% { transform: translate(-50%,-50%) scale(1) rotate(0); }
+    75% { opacity: 1; transform: translate(-50%,-58%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%,-88%) scale(.92); }
   }
 
-  /* Responsive Adjustments */
-  @media (max-width: 600px) {
-    #ui { padding: 10px; }
-    .hero-header { padding: 16px; }
-    .view-container { padding: 16px; }
-    .stat-card { padding: 10px; }
-    .stat-card .ico { width: 36px; height: 36px; font-size: 18px; }
-    .stat-val { font-size: 15px; }
+  /* ============ MODALS ============ */
+  .overlay {
+    position: fixed; inset: 0; z-index: 40; display: grid; place-items: center;
+    background: rgba(8,40,55,.38); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    padding: 16px; animation: fadeIn .18s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+  .modal-card {
+    width: min(430px, 100%); padding: 20px 20px 18px; text-align: center;
+    background: rgba(255,255,255,.92);
+    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+    border: 2px solid rgba(255,255,255,.9); border-radius: 26px;
+    box-shadow: 0 22px 54px rgba(8,40,60,.34);
+    animation: popIn .3s cubic-bezier(.2,1.5,.5,1);
+    max-height: calc(100dvh - 32px); overflow-y: auto;
+  }
+  @keyframes popIn { from { transform: scale(.8) translateY(14px); opacity: 0 } to { transform: none; opacity: 1 } }
+  .q-icon { font-size: 40px; line-height: 1; margin-bottom: 2px; animation: bobb 1.6s ease-in-out infinite; }
+  @keyframes bobb { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+  .modal-card h3 { margin: 0 0 3px; font-size: 16.5px; font-weight: 600; color: #17414f; }
+  .q-sub { margin: 0 0 14px; font-size: 11.5px; font-weight: 300; color: #6c8d99; line-height: 1.5; }
+  #qText {
+    font-size: clamp(26px, 6vw, 34px); font-weight: 700; color: #10404f; letter-spacing: 1px;
+    background: rgba(255,255,255,.72); border: 2px dashed rgba(53,183,126,.5);
+    border-radius: 16px; padding: 12px 8px; margin-bottom: 14px;
+  }
+  #qChoices { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .choice {
+    font-family: inherit; cursor: pointer; border: 2px solid rgba(255,255,255,.9);
+    background: rgba(255,255,255,.78); border-radius: 15px; padding: 13px 6px;
+    font-size: 20px; font-weight: 600; color: #17414f;
+    box-shadow: 0 4px 12px rgba(20,70,95,.12); transition: transform .12s, background .15s, border-color .15s;
+  }
+  .choice:hover:not(:disabled) { transform: translateY(-2px); border-color: #35B77E; background: #fff; }
+  .choice:active:not(:disabled) { transform: translateY(1px) scale(.98); }
+  .choice:disabled { cursor: default; }
+  .choice.right { background: #35B77E; border-color: #2b9566; color: #fff; }
+  .choice.wrong { background: #F0655A; border-color: #cc4a40; color: #fff; }
+  #qResult { margin-top: 12px; font-size: 14px; font-weight: 500; min-height: 22px; }
+  #qClose { margin-top: 12px; }
+
+  /* guide */
+  #guideBody { text-align: left; font-size: 12.5px; font-weight: 300; color: #2b5666; line-height: 1.75; }
+  #guideBody h4 { margin: 14px 0 4px; font-size: 13.5px; font-weight: 600; color: #17414f; }
+  #guideBody h4:first-child { margin-top: 4px; }
+  #guideBody b { font-weight: 600; color: #17414f; }
+  #guideBody .kbd {
+    display: inline-block; padding: 1px 7px; border-radius: 6px; font-weight: 600; font-size: 11.5px;
+    background: rgba(46,143,216,.14); color: #1f6ea8; border: 1px solid rgba(46,143,216,.3);
+  }
+  #guideBody ul { margin: 4px 0; padding-left: 20px; }
+
+  /* auth */
+  #authOverlay { z-index: 60; background: linear-gradient(180deg, rgba(127,214,245,.94), rgba(79,187,232,.96)); }
+  .field {
+    width: 100%; font-family: inherit; font-size: 14px; padding: 11px 13px; margin-bottom: 10px;
+    border-radius: 13px; border: 2px solid rgba(255,255,255,.9); background: rgba(255,255,255,.8);
+    color: #17414f; outline: none; transition: border-color .15s;
+  }
+  .field:focus { border-color: #35B77E; background: #fff; }
+  .authSwap { font-size: 12.5px; font-weight: 300; color: #5f8695; margin-top: 11px; }
+  .authSwap a { color: #2E8FD8; font-weight: 500; cursor: pointer; text-decoration: none; }
+  .authSwap a:hover { text-decoration: underline; }
+  #authMsg { min-height: 20px; font-size: 12.5px; font-weight: 500; color: #E0453C; margin-bottom: 4px; }
+
+  /* ============ MOBILE CONTROLS ============ */
+  #joystick {
+    position: fixed; left: 18px; bottom: 78px; width: 132px; height: 132px; z-index: 15;
+    border-radius: 50%; background: rgba(255,255,255,.22); border: 2px solid rgba(255,255,255,.55);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    touch-action: none; display: none;
+  }
+  #knob {
+    position: absolute; left: 50%; top: 50%; width: 58px; height: 58px; border-radius: 50%;
+    transform: translate(-50%,-50%); background: rgba(255,255,255,.85);
+    box-shadow: 0 4px 12px rgba(0,0,0,.22); pointer-events: none;
+  }
+  body.touch #joystick { display: block; }
+  .mtoggle {
+    position: fixed; z-index: 16; display: none; cursor: pointer;
+    width: 42px; height: 42px; border-radius: 14px; font-size: 20px;
+    align-items: center; justify-content: center; border: 1.5px solid rgba(255,255,255,.8);
+    background: rgba(255,255,255,.66); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    box-shadow: 0 6px 16px rgba(12,60,92,.18);
+  }
+  #mLeft { left: 10px; top: 10px; }
+  #mRight { right: 10px; top: 10px; }
+
+  /* ============ LOADER ============ */
+  #loader {
+    position: fixed; inset: 0; z-index: 90; display: grid; place-items: center;
+    background: linear-gradient(180deg,#7FD6F5,#4FBBE8); color: #0d4257; text-align: center;
+    transition: opacity .5s; font-weight: 500;
+  }
+  #loader .spin { font-size: 54px; animation: bobb 1.3s ease-in-out infinite; }
+  #loader .msg { margin-top: 12px; font-size: 15px; }
+  #loader .sub { margin-top: 5px; font-size: 12px; font-weight: 300; opacity: .8; max-width: 300px; }
+  #loader.gone { opacity: 0; pointer-events: none; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 880px), (max-height: 520px) {
+    #ui { padding: 9px; padding-top: 58px; }
+    .mtoggle { display: flex; }
+    #btnGuide { top: 12px; font-size: 11.5px; padding: 7px 15px; }
+
+    #hudCol { width: min(58vw, 250px); gap: 6px; max-height: min(46dvh, calc(100dvh - 120px)); }
+    #hud { padding: 10px; gap: 7px; border-radius: 16px; }
+    #hud h1 { font-size: 12.5px; }
+    #whoami { font-size: 10px; }
+    .stat { padding: 5px 8px; gap: 7px; border-radius: 11px; }
+    .stat .ico { width: 25px; height: 25px; flex-basis: 25px; font-size: 13px; border-radius: 8px; }
+    .stat .lbl { font-size: 9.5px; } .stat .val { font-size: 13px; }
+    #lvBadge { width: 30px; height: 30px; flex-basis: 30px; font-size: 11px; }
+    .btn { padding: 8px; font-size: 12px; border-radius: 11px; }
+    .btn.sm { padding: 7px; font-size: 10.5px; }
+    #earnLine { font-size: 10px; }
+    #waterPanel { padding: 7px 9px; border-radius: 14px; }
+    .drop { font-size: 13px; }
+
+    #shop { width: min(58vw, 250px); padding: 6px; border-radius: 16px; max-height: min(46dvh, calc(100dvh - 120px)); }
+    .tab { font-size: 11px; padding: 6px 2px 8px; }
+    .cname { font-size: 12px; } .csell { font-size: 10px; }
+    .ccost { font-size: 10px; } .cmeta { font-size: 9.5px; } .cdesc { font-size: 9.5px; } .cexp { font-size: 9.5px; }
+    .card { padding: 6px 8px; border-radius: 11px; }
+    #hint { font-size: 10px; padding: 6px 12px; bottom: 8px; max-width: 94vw; }
+    #robotLabel { font-size: 11px; padding: 3px 8px; }
+    .ftext { font-size: 16px; } .ftext.big { font-size: 20px; }
+
+    #hudCol, #shop { transition: transform .25s ease, opacity .25s ease; }
+    #hudCol.collapsed { transform: translateX(-120%); opacity: 0; pointer-events: none; }
+    #shop.collapsed { transform: translateX(120%); opacity: 0; pointer-events: none; }
+  }
+  @media (max-width: 480px) {
+    #hudCol { width: 60vw; } #shop { width: 60vw; }
+    .choice { font-size: 17px; padding: 11px 4px; }
+    #joystick { width: 116px; height: 116px; bottom: 84px; }
+    #knob { width: 52px; height: 52px; }
   }
 </style>
 </head>
 <body>
 
-<!-- Interactive Background Canvas -->
-<canvas id="bg-canvas"></canvas>
-
-<!-- Floating FX Container -->
-<div id="fx-layer"></div>
+<div id="loader">
+  <div>
+    <div class="spin">🌾</div>
+    <div class="msg">กำลังปลูกเกาะของคุณ...</div>
+    <div class="sub" id="loaderSub">กำลังโหลด Three.js &amp; Tone.js</div>
+  </div>
+</div>
 
 <div id="ui">
-  <!-- Hero Header -->
-  <header class="panel hero-header">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <span class="pill">⚡ FINAL EXAM LAB</span>
-      <span id="game-level" class="pill" style="background:#fef3c7; color:#d97706; border-color:#fde68a;">⭐ Lv.1 Novice</span>
-    </div>
-    <h1>ห้องซ้อมสอบปลายภาค 📚</h1>
-    <p>คณิตศาสตร์ · วิทยาศาสตร์ · สุขศึกษา · สังคมศึกษา | สรุปสูตร + แบบฝึกหัดโต้ตอบ</p>
-  </header>
+  <!-- ========== LEFT COLUMN ========== -->
+  <div id="hudCol">
+    <div id="hud" class="panel">
+      <h1>🌾 Mini Farm Island</h1>
+      <div id="whoami">ยินดีต้อนรับ</div>
 
-  <!-- HUD Dashboard -->
-  <div class="hud-row">
-    <div class="stat-card panel">
-      <div class="ico">🎯</div>
-      <div>
-        <div class="stat-lbl">คะแนนสะสม (EXP)</div>
-        <div class="stat-val" id="exp-val">0 PTS</div>
+      <div class="lvRow">
+        <div id="lvBadge">Lv.1</div>
+        <div class="lvMeta">
+          <div class="lvTop"><span>ค่าประสบการณ์</span><span id="expText">0/100</span></div>
+          <div class="bar"><i id="expBar"></i></div>
+        </div>
       </div>
-    </div>
-    <div class="stat-card panel green">
-      <div class="ico">✅</div>
-      <div>
-        <div class="stat-lbl">ทำถูกต้องแล้ว</div>
-        <div class="stat-val" id="correct-val">0 ข้อ</div>
+
+      <div class="stat">
+        <div class="ico">🪙</div>
+        <div><div class="lbl">เงินสะสม</div><div class="val"><span id="moneyVal">100</span> เหรียญ</div></div>
       </div>
+      <div class="stat box">
+        <div class="ico">📦</div>
+        <div><div class="lbl">ผลผลิตในคลัง</div><div class="val"><span id="invVal">0</span> ชิ้น</div></div>
+      </div>
+
+      <button id="sellBtn" class="btn" disabled>ขายผลผลิตทั้งหมด</button>
+      <div id="earnLine">ยอดขายรวม: 0 เหรียญ</div>
+      <div class="btnRow">
+        <button id="saveBtn" class="btn blue sm">💾 บันทึก</button>
+        <button id="bgmBtn" class="btn violet sm">🎵 ดนตรี</button>
+      </div>
+      <button id="logoutBtn" class="btn red sm">🚪 ออกจากระบบ</button>
     </div>
-    <div class="stat-card panel purple">
-      <div class="ico">🔥</div>
+
+    <div id="waterPanel" class="panel" title="คลิกบ่อน้ำในเกมเพื่อตอบคำถามรับน้ำ">
+      <div class="ico" style="width:30px;height:30px;flex:0 0 30px;border-radius:10px;display:grid;place-items:center;font-size:16px;background:linear-gradient(160deg,#9BE0FA,#2E8FD8);box-shadow:0 3px 8px rgba(46,143,216,.35)">💧</div>
       <div>
-        <div class="stat-lbl">Streak ต่อเนื่อง</div>
-        <div class="stat-val" id="streak-val">0x</div>
+        <div class="wlbl">น้ำสำหรับรดผัก</div>
+        <div class="wval"><span id="waterVal">0</span> / 5 หยด</div>
+        <div id="dropRow"></div>
       </div>
     </div>
   </div>
 
-  <!-- Navigation -->
-  <nav class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('home', this)">🏠 หน้าหลัก</button>
-    <button class="tab-btn" onclick="switchTab('quiz', this)">📝 ตะลุยโจทย์สอบ</button>
-  </nav>
-
-  <!-- MAIN HOME VIEW -->
-  <main id="home-view" class="panel view-container">
-    <h2 style="margin-top:0; font-size: 20px; color: var(--text-primary);">เลือกรายวิชาเพื่อเริ่มติว 🎯</h2>
-    <p style="color: var(--text-secondary); font-size: 13.5px; margin-bottom: 20px;">คลิกเลือกรายวิชาเพื่อดูเนื้อหาสรุป สูตรคำนวณ และแบบฝึกหัดย่อย</p>
-    
-    <div class="grid-2">
-      <div class="subject-card" onclick="openSubject('math')">
-        <div class="subject-icon">➗</div>
-        <div class="subject-info">
-          <b>คณิตศาสตร์</b>
-          <small>3 บทหลัก · สูตรคำนวณ · ตัวอย่างโจทย์</small>
-        </div>
-      </div>
-      <div class="subject-card" onclick="openSubject('science')">
-        <div class="subject-icon">🧬</div>
-        <div class="subject-info">
-          <b>วิทยาศาสตร์</b>
-          <small>ร่างกาย · แรง · ไฟฟ้า · โมเมนต์</small>
-        </div>
-      </div>
-      <div class="subject-card" onclick="openSubject('health')">
-        <div class="subject-icon">🩺</div>
-        <div class="subject-info">
-          <b>สุขศึกษา</b>
-          <small>เพศศึกษา · บริการสุขภาพ · บาสเกตบอล</small>
-        </div>
-      </div>
-      <div class="subject-card" onclick="openSubject('social')">
-        <div class="subject-icon">🌍</div>
-        <div class="subject-info">
-          <b>สังคมศึกษา</b>
-          <small>เครื่องมือทางภูมิศาสตร์ · ยุโรป · แอฟริกา</small>
-        </div>
-      </div>
+  <!-- ========== RIGHT SHOP ========== -->
+  <div id="shop" class="panel">
+    <div class="tabs">
+      <button class="tab active" data-tab="seeds">🌾 เมล็ดพันธุ์</button>
+      <button class="tab" data-tab="build">🔨 ก่อสร้าง</button>
     </div>
-  </main>
-
-  <!-- SUBJECT SECTIONS -->
-  <section id="math-view" class="panel view-container hidden">
-    <button class="btn-back" onclick="switchTab('home')">← กลับหน้าหลัก</button>
-    <h2 style="margin-top:0;">➗ วิชาคณิตศาสตร์</h2>
-    <p style="color: var(--text-secondary); font-size: 14px;">เลือกหัวข้อย่อยเพื่อเข้าสู่บทเรียน</p>
-    <div class="topic-grid">
-      <div class="topic-card" onclick="openTopic('math-transform')">
-        <b>🔄 การแปลงทางเรขาคณิต</b>
-        <small>เลื่อนขนาน · สะท้อน · หมุน</small>
-      </div>
-      <div class="topic-card" onclick="openTopic('math-power')">
-        <b>² เลขยกกำลัง</b>
-        <small>กฎและสมบัติการคำนวณ</small>
-      </div>
-      <div class="topic-card" onclick="openTopic('math-poly')">
-        <b>𝑥² พหุนาม</b>
-        <small>การบวก ลบ คูณ และแจกแจง</small>
-      </div>
-    </div>
-  </section>
-
-  <section id="science-view" class="panel view-container hidden">
-    <button class="btn-back" onclick="switchTab('home')">← กลับหน้าหลัก</button>
-    <h2 style="margin-top:0;">🧬 วิชาวิทยาศาสตร์</h2>
-    <p style="color: var(--text-secondary); font-size: 14px;">เลือกหัวข้อย่อยเพื่อเข้าสู่บทเรียน</p>
-    <div class="topic-grid">
-      <div class="topic-card" onclick="openTopic('sci-kidney')">
-        <b>🫘 ระบบขับถ่าย</b>
-        <small>ไต · ปัสสาวะ · โครงสร้างหน่วยไต</small>
-      </div>
-      <div class="topic-card" onclick="openTopic('sci-brain')">
-        <b>🧠 ระบบประสาท</b>
-        <small>สมอง · เซลล์ประสาท · รีเฟลกซ์</small>
-      </div>
-      <div class="topic-card" onclick="openTopic('sci-repro')">
-        <b>🧬 ระบบสืบพันธุ์</b>
-        <small>เซลล์สืบพันธุ์ · ฮอร์โมน · ประจำเดือน</small>
-      </div>
-      <div class="topic-card" onclick="openTopic('sci-force')">
-        <b>⚙️ แรงและการเคลื่อนที่</b>
-        <small>แรงลัพธ์ · แรงเสียดทาน · เวกเตอร์</small>
-      </div>
-      <div class="topic-card" onclick="openTopic('sci-fluid')">
-        <b>💧 ของเหลวและแรงพยุง</b>
-        <small>ความดันของเหลว · แรงพยุง</small>
-      </div>
-      <div class="topic-card" onclick="openTopic('sci-moment')">
-        <b>⚖️ โมเมนต์ของแรง</b>
-        <small>สูตร M = Fd · การสมดุล</small>
-      </div>
-      <div class="topic-card" onclick="openTopic('sci-electric')">
-        <b>⚡ แม่เหล็กและไฟฟ้า</b>
-        <small>ประจุไฟฟ้า · สนามไฟฟ้า · แท่งแม่เหล็ก</small>
-      </div>
-    </div>
-  </section>
-
-  <section id="health-view" class="panel view-container hidden">
-    <button class="btn-back" onclick="switchTab('home')">← กลับหน้าหลัก</button>
-    <h2 style="margin-top:0;">🩺 วิชาสุขศึกษา</h2>
-    <p style="color: var(--text-secondary); font-size: 14px;">เลือกหัวข้อย่อยเพื่อเข้าสู่บทเรียน</p>
-    <div class="topic-grid">
-      <div class="topic-card" onclick="openTopic('health-sex')">
-        <b>❤️ เพศสัมพันธ์ในวัยเรียน</b>
-        <small>การยินยอม · ความปลอดภัย · การป้องกัน</small>
-      </div>
-      <div class="topic-card" onclick="openTopic('health-service')">
-        <b>🏥 บริการทางสุขภาพ</b>
-        <small>สิทธิประโยชน์ · แหล่งบริการ · การส่งต่อ</small>
-      </div>
-      <div class="topic-card" onclick="openTopic('health-tech')">
-        <b>📱 สุขภาพกับเทคโนโลยี</b>
-        <small>Screen Time · การนอน · พฤติกรรมสุขภาพ</small>
-      </div>
-      <div class="topic-card" onclick="openTopic('health-basket')">
-        <b>🏀 ประวัติบาสเกตบอล</b>
-        <small>ผู้คิดค้น · กติกาสำคัญ · พัฒนาการ</small>
-      </div>
-    </div>
-  </section>
-
-  <section id="social-view" class="panel view-container hidden">
-    <button class="btn-back" onclick="switchTab('home')">← กลับหน้าหลัก</button>
-    <h2 style="margin-top:0;">🌍 วิชาสังคมศึกษา</h2>
-    <p style="color: var(--text-secondary); font-size: 14px;">เลือกหัวข้อย่อยเพื่อเข้าสู่บทเรียน</p>
-    <div class="topic-grid">
-      <div class="topic-card" onclick="openTopic('social-map')">
-        <b>🧭 เครื่องมือทางภูมิศาสตร์</b>
-        <small>ทิศ · มาตราส่วน · การคำนวณจริง</small>
-      </div>
-      <div class="topic-card" onclick="openTopic('social-europe')">
-        <b>🇪🇺 ทวีปยุโรป</b>
-        <small>ลักษณะภูมิประเทศ · ภูมิอากาศ · เศรษฐกิจ</small>
-      </div>
-      <div class="topic-card" onclick="openTopic('social-africa')">
-        <b>🌍 ทวีปแอฟริกา</b>
-        <small>แม่น้ำไนล์ · ซาฮารา · ทรัพยากรธรรมชาติ</small>
-      </div>
-      <div class="topic-card" onclick="openTopic('social-disaster')">
-        <b>🌪️ สิ่งแวดล้อมและภัยพิบัติ</b>
-        <small>สาเหตุ · ผลกระทบ · การเตรียมรับมือ</small>
-      </div>
-    </div>
-  </section>
-
-  <!-- TOPIC DETAIL VIEW -->
-  <section id="topic-detail-view" class="panel view-container hidden">
-    <button class="btn-back" onclick="backToSubject()">← กลับไปหน้ารวมวิชา</button>
-    <div id="topic-content-body"></div>
-  </section>
-
-  <!-- QUIZ VIEW -->
-  <section id="quiz-view" class="panel view-container hidden">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-      <div>
-        <h2 style="margin:0;">📝 แบบทดสอบรวมทุกวิชา</h2>
-        <p style="margin:4px 0 0; color:var(--text-secondary); font-size:13.5px;">ตอบคำถามเพื่อรับ EXP และไต่ระดับเลเวล!</p>
-      </div>
-    </div>
-    <div id="quiz-container"></div>
-    <div id="quiz-score-board" style="text-align:center; padding:10px; font-size:20px; font-weight:700;"></div>
-    <button class="btn-primary" onclick="generateQuizSet()">🎲 สุ่มชุดข้อสอบใหม่</button>
-  </section>
+    <div class="tab-body" id="tabSeeds"></div>
+    <div class="tab-body hidden" id="tabBuild"></div>
+  </div>
 </div>
 
-<script>
-/* =====================================================================
-   BACKGROUND CANVAS ANIMATION (Clean Floating Bubbles)
-   ===================================================================== */
-const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d');
-let bubbles = [];
+<button id="btnGuide">📖 คู่มือ</button>
 
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+<div id="hint">
+  <span id="hintText"><b>WASD</b> / จอยสติ๊ก เดินหุ่นยนต์ &nbsp;•&nbsp; คลิก<u>บ่อน้ำ</u>ตอบคำถามรับ 💧 &nbsp;•&nbsp; คลิกแปลง <b>ปลูก</b> / <i>เก็บเกี่ยว</i></span>
+</div>
 
-class Bubble {
-  constructor() {
-    this.reset();
-  }
-  reset() {
-    this.x = Math.random() * canvas.width;
-    this.y = canvas.height + Math.random() * 100;
-    this.radius = Math.random() * 15 + 5;
-    this.speed = Math.random() * 1 + 0.5;
-    this.alpha = Math.random() * 0.3 + 0.1;
-  }
-  update() {
-    this.y -= this.speed;
-    if (this.y < -this.radius) this.reset();
-  }
-  draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
-    ctx.fill();
-  }
-}
+<div id="robotLabel">QUIZ 🤖</div>
+<div id="fx"></div>
 
-for (let i = 0; i < 25; i++) bubbles.push(new Bubble());
+<div id="joystick"><div id="knob"></div></div>
+<div class="mtoggle" id="mLeft">👤</div>
+<div class="mtoggle" id="mRight">🛒</div>
 
-function animateBG() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  bubbles.forEach(b => {
-    b.update();
-    b.draw();
-  });
-  requestAnimationFrame(animateBG);
-}
-animateBG();
+<!-- ========== QUIZ MODAL ========== -->
+<div id="modal" class="overlay hidden">
+  <div class="modal-card">
+    <div class="q-icon" id="qIcon">🤖</div>
+    <h3 id="qTitle">ควิซคณิตศาสตร์</h3>
+    <p class="q-sub" id="qSub"></p>
+    <div id="qText">? + ? = ?</div>
+    <div id="qChoices"></div>
+    <div id="qResult"></div>
+    <button id="qClose" class="btn blue hidden">ปิดหน้าต่าง</button>
+  </div>
+</div>
 
-/* =====================================================================
-   GAME ENGINE STATE & DATA
-   ===================================================================== */
-let gameState = {
-  exp: 0,
-  correct: 0,
-  streak: 0,
-  currentSubject: 'home'
-};
-
-const topicData = {
-  "math-transform": {
-    subject: "math", title: "🔄 การแปลงทางเรขาคณิต",
-    html: `
-      <h2>การแปลงทางเรขาคณิต</h2>
-      <p>ประกอบด้วย <b>การเลื่อนขนาน · การสะท้อน · การหมุน</b> โดยเน้นการพิจารณาพิกัดบนระนาบมุมฉาก</p>
-      <h3>1) การเลื่อนขนาน (Translation)</h3>
-      <div class="formula-box">(x, y) → (x + a, y + b)</div>
-      <div class="step-box">ตัวอย่าง: จุด (2, 3) เลื่อนไปทางขวา 4 หน่วย และขึ้นบน 2 หน่วย → (2+4, 3+2) = <b>(6, 5)</b></div>
-      <h3>2) การสะท้อน (Reflection)</h3>
-      <div class="formula-box">สะท้อนแกน X: (x, y) → (x, −y)<br>สะท้อนแกน Y: (x, y) → (−x, y)</div>
-      <div class="step-box">เทคนิคจำ: สะท้อนข้ามแกนไหน ค่าพิกัดของแกนนั้นจะคงเดิม แต่ค่าอีกแกนจะเปลี่ยนเครื่องหมาย</div>
-      <h3>3) การหมุนรอบจุดกำเนิด (Rotation)</h3>
-      <div class="formula-box">หมุนทวนเข็ม 90°: (x, y) → (−y, x)<br>หมุน 180°: (x, y) → (−x, −y)<br>หมุนทวนเข็ม 270°: (x, y) → (y, −x)</div>
-      <h3>ทดสอบความเข้าใจ</h3>
-      <div class="mini-quiz-grid">
-        <button class="mini-btn" onclick="checkMini(this, true)">จุด (3, −2) สะท้อนข้ามแกน X จะได้พิกัด (3, 2)</button>
-        <button class="mini-btn" onclick="checkMini(this, false)">จุด (1, 2) หมุนรอบจุดกำเนิด 180° จะได้พิกัด (1, −2)</button>
-      </div>
-    `
-  },
-  "math-power": {
-    subject: "math", title: "² เลขยกกำลัง",
-    html: `
-      <h2>สมบัติของเลขยกกำลัง</h2>
-      <div class="formula-box">aᵐ × aⁿ = aᵐ⁺ⁿ<br>aᵐ ÷ aⁿ = aᵐ⁻ⁿ<br>(aᵐ)ⁿ = aᵐⁿ<br>a⁰ = 1 (เมื่อ a ≠ 0)</div>
-      <div class="step-box"><b>หลักการคิด:</b><br>• ฐานเดียวกันคูณกัน → นำเลขชี้กำลังมาบวกกัน<br>• ฐานเดียวกันหารกัน → นำเลขชี้กำลังมาลบกัน<br>• กำลังซ้อนกัน → นำเลขชี้กำลังมาคูณกัน</div>
-      <div class="example-box">ตัวอย่าง 1: 2³ × 2⁴ = 2³⁺⁴ = 2⁷ = <span class="answer-text">128</span></div>
-      <div class="example-box">ตัวอย่าง 2: 3⁵ ÷ 3² = 3⁵⁻² = 3³ = <span class="answer-text">27</span></div>
-      <h3>ทดสอบความเข้าใจ</h3>
-      <div class="mini-quiz-grid">
-        <button class="mini-btn" onclick="checkMini(this, true)">2² × 2³ มีค่าเท่ากับ 2⁵ (32)</button>
-        <button class="mini-btn" onclick="checkMini(this, false)">5⁴ ÷ 5² มีค่าเท่ากับ 5⁶</button>
-      </div>
-    `
-  },
-  "math-poly": {
-    subject: "math", title: "𝑥² พหุนาม",
-    html: `
-      <h2>การดำเนินการของพหุนาม</h2>
-      <p>การบวกและลบพหุนาม ทำได้โดยการรวม <b>พจน์ที่คล้ายกัน</b> (พจน์ที่มีตัวแปรชุดเดียวกันและมีเลขชี้กำลังเท่ากัน)</p>
-      <div class="formula-box">การแจกแจง: a(b + c) = ab + ac</div>
-      <div class="example-box">ตัวอย่าง 1: 3x + 5x − 2 = <span class="answer-text">8x − 2</span></div>
-      <div class="example-box">ตัวอย่าง 2: 2(x + 3) = <span class="answer-text">2x + 6</span></div>
-      <h3>ทดสอบความเข้าใจ</h3>
-      <div class="mini-quiz-grid">
-        <button class="mini-btn" onclick="checkMini(this, true)">4x + 2x − 3 จัดรูปอย่างง่ายได้ 6x − 3</button>
-        <button class="mini-btn" onclick="checkMini(this, false)">3x + 2y รวมพจน์กันได้เป็น 5xy</button>
-      </div>
-    `
-  },
-  "sci-kidney": {
-    subject: "science", title: "🫘 ระบบขับถ่าย",
-    html: `
-      <h2>ระบบขับถ่ายและโครงสร้างไต</h2>
-      <div class="diagram-box">🩸 เลือด → 🫘 ไต → 🧪 กรองของเสีย → 💧 ปัสสาวะ</div>
-      <p>ไตทำหน้าที่กรองของเสียออกจากเลือด และรักษาการสมดุลของน้ำและเกลือแร่ในร่างกาย</p>
-      <h3>หน่วยไต (Nephron)</h3>
-      <div class="step-box">ทำหน้าที่เป็นหน่วยกรองพื้นฐาน ประกอบด้วย โกลเมอรูลัส (Glomerulus), โบว์แมนส์แคปซูล (Bowman's capsule) และท่อหน่วยไต</div>
-    `
-  },
-  "sci-brain": {
-    subject: "science", title: "🧠 ระบบประสาท",
-    html: `
-      <h2>ระบบประสาทและการตอบสนอง</h2>
-      <div class="diagram-box">🧠 สมอง ↔ ⚡ ไขสันหลัง ↔ 🖐️ หน่วยปฏิบัติงาน</div>
-      <h3>โครงสร้างเซลล์ประสาท</h3>
-      <p>• <b>เดนไดรต์ (Dendrite):</b> นำกระแสประสาทเข้าสู่ตัวเซลล์<br>• <b>แอกซอน (Axon):</b> นำกระแสประสาทออกจากตัวเซลล์</p>
-      <h3>การทำงานของสมอง</h3>
-      <p>• <b>ซีรีบรัม (Cerebrum):</b> ควบคุมความคิด ความจำ ปัญญา การเคลื่อนไหวใต้บังคับจิตใจ<br>• <b>ซีรีเบลลัม (Cerebellum):</b> ควบคุมการทรงตัวและการประสานงานของกล้ามเนื้อ</p>
-    `
-  },
-  "sci-repro": {
-    subject: "science", title: "🧬 ระบบสืบพันธุ์",
-    html: `
-      <h2>เซลล์สืบพันธุ์และฮอร์โมน</h2>
-      <p><b>เซลล์สืบพันธุ์เพศชาย:</b> อสุจิ (Sperm) | <b>เซลล์สืบพันธุ์เพศหญิง:</b> เซลล์ไข่ (Oocyte)</p>
-      <div class="diagram-box">📈 ฮอร์โมน ➔ 🥚 การตกไข่ ➔ 🩸 ประจำเดือน</div>
-      <div class="step-box">การปฏิสนธิเกิดขึ้นบริเวณ <b>ปีกมดลูก (ท่อนำไข่)</b> และตัวอ่อนจะเดินทางมาฝังตัวที่ผนังมดลูก</div>
-    `
-  },
-  "sci-force": {
-    subject: "science", title: "⚙️ แรงและการเคลื่อนที่",
-    html: `
-      <h2>ปริมาณทางฟิสิกส์และแรง</h2>
-      <div class="formula-box">อัตราเร็ว (v) = ระยะทาง (s) ÷ เวลา (t)<br>ความเร็ว (v⃗) = การกระจัด (s⃗) ÷ เวลา (t)</div>
-      <p>• <b>สเกลาร์:</b> มีเฉพาะขนาด เช่น ระยะทาง, อัตราเร็ว, มวล<br>• <b>เวกเตอร์:</b> มีทั้งขนาดและทิศทาง เช่น การกระจัด, ความเร็ว, แรง</p>
-      <div class="formula-box">แรงเสียดทาน: f = μN</div>
-    `
-  },
-  "sci-fluid": {
-    subject: "science", title: "💧 ของเหลวและแรงพยุง",
-    html: `
-      <h2>ความดันและแรงพยุงของของเหลว</h2>
-      <div class="formula-box">แรงพยุง (Fᵦ) = ρgV<br>ความดันของเหลว (P) = ρgh</div>
-      <div class="step-box"><b>หลักของอาร์คิมีดีส:</b> แรงพยุงที่กระทำต่อวัตถุมีขนาดเท่ากับน้ำหนักของของเหลวที่ถูกวัตถุนั้นแทนที่</div>
-    `
-  },
-  "sci-moment": {
-    subject: "science", title: "⚖️ โมเมนต์ของแรง",
-    html: `
-      <h2>โมเมนต์และการสมดุล</h2>
-      <div class="formula-box">M = F × d</div>
-      <p>M = โมเมนต์ (N·m), F = แรง (N), d = ระยะทางตั้งฉากจากจุดหมุนถึงแนวแรง (m)</p>
-      <div class="formula-box">เมื่อคานสมดุล: ผลรวมโมเมนต์ทวนเข็ม = ผลรวมโมเมนต์ตามเข็ม</div>
-    `
-  },
-  "sci-electric": {
-    subject: "science", title: "⚡ แม่เหล็กและไฟฟ้า",
-    html: `
-      <h2>สนามไฟฟ้าและแม่เหล็ก</h2>
-      <div class="formula-box">สนามไฟฟ้า (E) = F / q</div>
-      <div class="step-box">• ทิศทางของสนามไฟฟ้า: พุ่งออกจากประจุบวก และพุ่งเข้าหาประจุลบ<br>• เส้นสนามแม่เหล็กภายนอกแท่งแม่เหล็ก: พุ่งออกจากขั้วเหนือ (N) ไปยังขั้วใต้ (S)</div>
-    `
-  },
-  "health-sex": {
-    subject: "health", title: "❤️ เพศสัมพันธ์ในวัยเรียน",
-    html: `
-      <h2>การตัดสินใจและการป้องกัน</h2>
-      <p>เน้นหลักการยินยอมพร้อมใจ (Consent), ความปลอดภัย, การรับผิดชอบร่วมกัน และการป้องกันการตั้งครรภ์ไม่พร้อมรวมถึงโรคติดต่อทางเพศสัมพันธ์ (STIs)</p>
-      <div class="step-box">การใช้ถุงยางอนามัยอย่างถูกวิธีเป็นวิธีเดียวที่สามารถป้องกันได้ทั้งการตั้งครรภ์และโรคติดต่อทางเพศสัมพันธ์พร้อมกัน</div>
-    `
-  },
-  "health-service": {
-    subject: "health", title: "🏥 บริการทางสุขภาพ",
-    html: `
-      <h2>การเลือกใช้บริการทางสุขภาพ</h2>
-      <p>เข้าใจสิทธิขั้นพื้นฐาน หลักประกันสุขภาพถ้วนหน้า และการเลือกใช้บริการสถานพยาบาลให้เหมาะสมกับระดับอาการป่วย</p>
-    `
-  },
-  "health-tech": {
-    subject: "health", title: "📱 สุขภาพกับเทคโนโลยี",
-    html: `
-      <h2>การจัดสมดุลการใช้เทคโนโลยี</h2>
-      <p>ลดพฤติกรรมเนือยนิ่ง (Sedentary Behavior) บริหารเวลาหน้าจอ (Screen Time) และปรับสุขอนามัยการนอนหลับ</p>
-    `
-  },
-  "health-basket": {
-    subject: "health", title: "🏀 ประวัติบาสเกตบอล",
-    html: `
-      <h2>ประวัติและกติกาบาสเกตบอล</h2>
-      <p>คิดค้นโดย <b>ดร.เจมส์ ไนสมิธ (Dr. James Naismith)</b> ในปี ค.ศ. 1891 ที่ประเทศสหรัฐอเมริกา เพื่อเป็นกีฬาในร่มช่วงฤดูหนาว</p>
-    `
-  },
-  "social-map": {
-    subject: "social", title: "🧭 เครื่องมือทางภูมิศาสตร์",
-    html: `
-      <h2>การคำนวณมาตราส่วนแผนที่</h2>
-      <div class="formula-box">มาตราส่วน = ระยะทางบนแผนที่ ÷ ระยะทางจริง</div>
-      <div class="example-box">ตัวอย่าง: แผนที่มาตราส่วน 1 : 100,000 หากวัดระยะบนแผนที่ได้ 1 ซม. ระยะทางจริงคือ 100,000 ซม. = <span class="answer-text">1 กิโลเมตร</span></div>
-    `
-  },
-  "social-europe": {
-    subject: "social", title: "🇪🇺 ทวีปยุโรป",
-    html: `
-      <h2>ลักษณะทางกายภาพของยุโรป</h2>
-      <p>ทวีปยุโรปไม่มีเขตภูมิอากาศแบบแห้งแล้ง/ทะเลทราย มีชายฝั่งเว้าแหว่งมาก เหมาะแก่การเป็นท่าเรือธรรมชาติ</p>
-    `
-  },
-  "social-africa": {
-    subject: "social", title: "🌍 ทวีปแอฟริกา",
-    html: `
-      <h2>ลักษณะทางกายภาพของแอฟริกา</h2>
-      <p>มีแม่น้ำไนล์เป็นแม่น้ำที่ยาวที่สุดในโลก มีทะเลทรายซาฮาราอยู่ทางตอนเหนือ และมีพื้นที่ส่วนใหญ่เป็นที่ราบสูง</p>
-    `
-  },
-  "social-disaster": {
-    subject: "social", title: "🌪️ สิ่งแวดล้อมและภัยพิบัติ",
-    html: `
-      <h2>ภัยธรรมชาติและการรับมือ</h2>
-      <p>การแยกแยะระหว่างภัยธรรมชาติ (แผ่นดินไหว, สึนามิ, พายุ) กับปัญหาสิ่งแวดล้อมจากกิจกรรมมนุษย์ (ภาวะโลกร้อน, PM2.5)</p>
-    `
-  }
-};
-
-const quizQuestions = [
-  { cat: "คณิต", q: "จุด (2,3) สะท้อนข้ามแกน X จะได้จุดพิกัดใหม่คือข้อใด?", o: ["(2, -3)", "(-2, 3)", "(-2, -3)", "(3, 2)"], a: 0, e: "การสะท้อนข้ามแกน X ค่า x จะคงเดิม แต่ค่า y จะเปลี่ยนเครื่องหมายเป็นตรงข้าม" },
-  { cat: "คณิต", q: "ผลคูณของ 2³ × 2⁴ มีค่าตรงกับข้อใด?", o: ["2⁷", "2¹²", "4⁷", "2¹"], a: 0, e: "ฐานเหมือนกันคูณกัน นำเลขชี้กำลังมาบวกกัน (3 + 4 = 7)" },
-  { cat: "คณิต", q: "ผลบวกพหุนามอย่างง่ายของ 3x + 5x − 2 คือข้อใด?", o: ["8x − 2", "8x + 2", "6x − 2", "15x"], a: 0, e: "นำพจน์ที่คล้ายกันมารวมกัน: (3x + 5x) − 2 = 8x − 2" },
-  { cat: "วิทย์", q: "โครงสร้างใดทำหน้าที่เป็นหน่วยกรองปัสสาวะขั้นพื้นฐานของไต?", o: ["นิวรอน", "หน่วยไต (Nephron)", "ถุงลม", "เกล็ดเลือด"], a: 1, e: "Nephron (หน่วยไต) ทำหน้าที่กรองของเสียและปรับสมดุลสารในเลือด" },
-  { cat: "วิทย์", q: "วัตถุเคลื่อนที่ได้ระยะทาง 20 เมตร ในเวลา 4 วินาที อัตราเร็วเฉลี่ยมีค่าเท่าใด?", o: ["4 m/s", "5 m/s", "16 m/s", "80 m/s"], a: 1, e: "อัตราเร็ว = ระยะทาง ÷ เวลา = 20 ÷ 4 = 5 m/s" },
-  { cat: "วิทย์", q: "เมื่อความลึกของของเหลวเพิ่มขึ้น ความดันของของเหลวจะเปลี่ยนแปลงอย่างไร?", o: ["ลดลง", "เท่าเดิม", "เพิ่มขึ้น", "กลายเป็นศูนย์"], a: 2, e: "จากสูตร P = ρgh ความดันแปรผันตรงกับความลึก (h)" },
-  { cat: "วิทย์", q: "เส้นสนามไฟฟ้าที่เกิดจากประจุไฟฟ้าบวกมีทิศทางอย่างไร?", o: ["พุ่งเข้าหาประจุ", "พุ่งออกจากประจุ", "วนเป็นวงกลม", "ไม่มีทิศทาง"], a: 1, e: "เส้นสนามไฟฟ้าจากประจุบวกจะมีทิศพุ่งออกจากประจุเสมอ" },
-  { cat: "สุขศึกษา", q: "การตัดสินใจเรื่องเพศอย่างรับผิดชอบ ควรยึดถือหลักการใดเป็นสำคัญที่สุด?", o: ["ทำตามกลุ่มเพื่อน", "การยินยอมและความปลอดภัย", "ทำตามกระแสนิยม", "ความพึงพอใจชั่วคราว"], a: 1, e: "การยินยอม (Consent) ความปลอดภัย และผลกระทบที่ตามมาคือสิ่งสำคัญที่สุด" },
-  { cat: "สังคม", q: "ทิศทางใดอยู่ตรงข้ามกับทิศตะวันออก?", o: ["ทิศเหนือ", "ทิศใต้", "ทิศตะวันตก", "ทิศตะวันออกเฉียงเหนือ"], a: 2, e: "ทิศตะวันออก (East) อยู่ตรงข้ามกับทิศตะวันตก (West)" },
-  { cat: "สังคม", q: "แผนที่มาตราส่วน 1 : 100,000 ระยะทางบนแผนที่ 1 ซม. เท่ากับระยะทางจริงเท่าใด?", o: ["100 เมตร", "1 กิโลเมตร", "10 กิโลเมตร", "100 กิโลเมตร"], a: 1, e: "100,000 ซม. = 1,000 เมตร = 1 กิโลเมตร" }
-];
-
-/* =====================================================================
-   INTERACTION & NAVIGATION LOGIC
-   ===================================================================== */
-function switchTab(viewId, btnEl) {
-  const views = ['home-view', 'math-view', 'science-view', 'health-view', 'social-view', 'topic-detail-view', 'quiz-view'];
-  views.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.add('hidden');
-  });
-
-  const target = document.getElementById(viewId + '-view');
-  if (target) target.classList.remove('hidden');
-
-  if (btnEl) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btnEl.classList.add('active');
-  }
-
-  if (viewId === 'quiz') generateQuizSet();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function openSubject(subjectId) {
-  gameState.currentSubject = subjectId;
-  switchTab(subjectId);
-}
-
-function openTopic(topicId) {
-  const data = topicData[topicId];
-  if (!data) return;
-  
-  document.getElementById('topic-content-body').innerHTML = `
-    <span class="pill" style="margin-bottom:12px;">${data.subject.toUpperCase()}</span>
-    ${data.html}
-  `;
-  
-  const views = ['home-view', 'math-view', 'science-view', 'health-view', 'social-view', 'quiz-view'];
-  views.forEach(id => document.getElementById(id).classList.add('hidden'));
-  document.getElementById('topic-detail-view').classList.remove('hidden');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function backToSubject() {
-  switchTab(gameState.currentSubject || 'home');
-}
-
-function triggerSpark(x, y, text) {
-  const layer = document.getElementById('fx-layer');
-  const spark = document.createElement('div');
-  spark.className = 'floating-spark';
-  spark.innerText = text;
-  spark.style.left = `${x}px`;
-  spark.style.top = `${y}px`;
-  spark.style.color = text.includes('+') ? '#16a34a' : '#e11d48';
-  layer.appendChild(spark);
-  setTimeout(() => spark.remove(), 1200);
-}
-
-function addEXP(amount, event) {
-  gameState.exp += amount;
-  document.getElementById('exp-val').innerText = `${gameState.exp} PTS`;
-  
-  // Level Calculation
-  let lvl = Math.floor(gameState.exp / 50) + 1;
-  document.getElementById('game-level').innerText = `⭐ Lv.${lvl} Scholar`;
-
-  if (event) {
-    triggerSpark(event.clientX, event.clientY, `+${amount} EXP`);
-  }
-}
-
-function checkMini(btn, isCorrect) {
-  if (btn.dataset.done) return;
-  btn.dataset.done = "1";
-  
-  if (isCorrect) {
-    btn.style.borderColor = "#22c55e";
-    btn.style.background = "#dcfce7";
-    btn.innerText += "  ✅ ถูกต้อง!";
-    addEXP(10, window.event);
-  } else {
-    btn.style.borderColor = "#f43f5e";
-    btn.style.background = "#ffe4e6";
-    btn.innerText += "  ❌ ยังไม่ถูกต้อง";
-  }
-}
-
-/* =====================================================================
-   QUIZ SYSTEM
-   ===================================================================== */
-function generateQuizSet() {
-  const container = document.getElementById('quiz-container');
-  document.getElementById('quiz-score-board').innerText = '';
-  
-  let shuffled = [...quizQuestions].sort(() => Math.random() - 0.5);
-  container.innerHTML = shuffled.map((q, idx) => `
-    <div class="quiz-card" data-qidx="${idx}">
-      <span class="pill">${q.cat}</span>
-      <p>${idx + 1}. ${q.q}</p>
-      <div>
-        ${q.o.map((opt, oIdx) => `
-          <button class="opt-btn" onclick="answerQuiz(this, ${oIdx === q.a}, '${q.e.replace(/'/g, "\\'")}')">
-            ${String.fromCharCode(65 + oIdx)}.${opt}
-          </button>
-        `).join('')}
-      </div>
-      <div class="explain-text hidden"></div>
+<!-- ========== GUIDE MODAL ========== -->
+<div id="guideModal" class="overlay hidden">
+  <div class="modal-card" style="width:min(520px,100%)">
+    <div class="q-icon">📖</div>
+    <h3>คู่มือการเล่น</h3>
+    <div id="guideBody">
+      <h4>🎮 การควบคุม</h4>
+      <ul>
+        <li>เดินหุ่นยนต์: <span class="kbd">W</span> <span class="kbd">A</span> <span class="kbd">S</span> <span class="kbd">D</span> หรือลูกศร (มือถือใช้จอยสติ๊กมุมซ้ายล่าง)</li>
+        <li>หมุนกล้อง: ลากเมาส์ซ้าย / ลากนิ้ว &nbsp;•&nbsp; ซูม: สกอร์ล / บีบสองนิ้ว</li>
+      </ul>
+      <h4>🌱 ปลูก → เก็บเกี่ยว → ขาย</h4>
+      <ul>
+        <li>เลือกเมล็ดจากแผงขวา แล้วคลิกแปลงดินว่างเพื่อปลูก (หักเงินทันที)</li>
+        <li>รอจนหลอดเวลาเต็ม ต้นไม้จะเด้งใหญ่ขึ้น → คลิกอีกครั้งเพื่อเก็บเข้าคลัง พร้อมรับ <b>EXP</b></li>
+        <li>กด <b>ขายผลผลิตทั้งหมด</b> เพื่อเปลี่ยนของในคลังเป็นเงิน</li>
+      </ul>
+      <h4>💧 ระบบน้ำ (เร่งการเติบโต)</h4>
+      <ul>
+        <li>คลิก <b>บ่อน้ำ</b> เพื่อตอบคำถามคณิตศาสตร์ — ตอบถูกได้ <b>น้ำ 2 หยด</b> (เก็บได้สูงสุด 5 หยด)</li>
+        <li>คลิกแปลงที่<b>กำลังโต</b>ขณะมีน้ำ = ใช้น้ำ 1 หยด ทำให้พืชโตเต็มที่ทันที</li>
+      </ul>
+      <h4>🤖 หุ่นยนต์ผู้ช่วย</h4>
+      <ul>
+        <li>คลิกที่ตัวหุ่นยนต์เพื่อเล่นควิซโบนัส — ตอบถูกได้บัฟ <b>รดน้ำ 10 วินาที</b> พืชทุกแปลงโตไวขึ้น 1.5 เท่า</li>
+        <li>ตอบผิดหุ่นยนต์จะพัง 10 วินาที (ยังเดินได้ แต่กดควิซไม่ได้จนกว่าจะซ่อมเสร็จ)</li>
+      </ul>
+      <h4>📈 เลเวลและการขยายเกาะ</h4>
+      <ul>
+        <li>เก็บเกี่ยวเพื่อรับ EXP — เลเวลถัดไปต้องใช้ <b>เลเวล × 100 EXP</b></li>
+        <li>พืชราคาแพงจะปลดล็อคตามเลเวล (กะหล่ำ Lv.2, ข้าวโพด Lv.3, ฟักทอง Lv.4, สตรอเบอร์รี่ Lv.5)</li>
+        <li>ซื้อ <b>ขยายแปลงผัก</b> เพิ่มช่องบนเกาะหลักได้ถึง 12 ช่อง</li>
+        <li>ปลดล็อคเกาะ 2/3/4 เพื่อเพิ่มแปลงอีกเกาะละ 6 ช่อง (รวมสูงสุด 30 ช่อง) แล้วเดินข้าม<b>สะพาน</b>ไปได้</li>
+      </ul>
+      <h4>💾 บันทึกเกม</h4>
+      <ul>
+        <li>เกมบันทึกอัตโนมัติทุก 20 วินาที และตอนกดออกจากระบบ — ข้อมูลเก็บไว้ในเบราว์เซอร์เครื่องนี้</li>
+      </ul>
     </div>
-  `).join('');
-}
+    <button id="guideClose" class="btn" style="margin-top:16px">เริ่มเล่นเลย!</button>
+  </div>
+</div>
 
-function answerQuiz(btn, isCorrect, explain) {
-  const card = btn.closest('.quiz-card');
-  if (card.dataset.answered) return;
-  card.dataset.answered = "1";
+<!-- ========== AUTH ========== -->
+<div id="authOverlay" class="overlay">
+  <div class="modal-card" style="width:min(370px,100%)">
+    <div class="q-icon">🌾</div>
+    <h3 id="authTitle">ลงชื่อเข้าใช้</h3>
+    <p class="q-sub">เข้าสู่เกาะฟาร์มของคุณ — ข้อมูลบันทึกไว้ในเบราว์เซอร์เครื่องนี้</p>
+    <div id="loginForm">
+      <input class="field" id="loginUser" type="text" placeholder="ชื่อผู้ใช้ (Username)" autocomplete="username">
+      <div id="authMsg"></div>
+      <button class="btn" id="btnLogin">เข้าสู่ระบบ</button>
+      <div class="authSwap">ยังไม่มีบัญชี? <a id="toRegister">สมัครสมาชิก</a></div>
+    </div>
+    <div id="registerForm" class="hidden">
+      <input class="field" id="regUser" type="text" placeholder="ชื่อผู้ใช้ (Username)" autocomplete="username">
+      <input class="field" id="regFirst" type="text" placeholder="ชื่อ (First Name)">
+      <input class="field" id="regLast" type="text" placeholder="นามสกุล (Last Name)">
+      <div id="authMsg2" style="min-height:20px;font-size:12.5px;font-weight:500;color:#E0453C;margin-bottom:4px"></div>
+      <button class="btn" id="btnRegister">สมัครสมาชิก</button>
+      <div class="authSwap">มีบัญชีอยู่แล้ว? <a id="toLogin">เข้าสู่ระบบ</a></div>
+    </div>
+  </div>
+</div>
 
-  const allBtns = card.querySelectorAll('.opt-btn');
-  allBtns.forEach(b => b.disabled = true);
-
-  const explainEl = card.querySelector('.explain-text');
-  explainEl.classList.remove('hidden');
-
-  if (isCorrect) {
-    btn.classList.add('correct');
-    explainEl.innerHTML = `✅ <b>ถูกต้อง!</b> ${explain}`;
-    gameState.correct++;
-    gameState.streak++;
-    document.getElementById('correct-val').innerText = `${gameState.correct} ข้อ`;
-    document.getElementById('streak-val').innerText = `${gameState.streak}x`;
-    addEXP(20, window.event);
-  } else {
-    btn.classList.add('wrong');
-    explainEl.innerHTML = `❌ <b>ยังไม่ถูกต้อง:</b> ${explain}`;
-    gameState.streak = 0;
-    document.getElementById('streak-val').innerText = `0x`;
+<script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
   }
 }
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* =====================================================================
+   0. CONFIG & GAME STATE
+   ===================================================================== */
+const CROPS = {
+  tomato:     { key:'tomato',     name:'มะเขือเทศ',   emoji:'🍅', cost:10,  sell:25,   time:5,  exp:5,   minLevel:1, color:0xE84B3C, leaf:0x4CA64C },
+  carrot:     { key:'carrot',     name:'แครอท',      emoji:'🥕', cost:20,  sell:60,   time:8,  exp:12,  minLevel:1, color:0xF2872E, leaf:0x59B35A },
+  cabbage:    { key:'cabbage',    name:'กะหล่ำปลี',   emoji:'🥬', cost:50,  sell:200,  time:12, exp:30,  minLevel:2, color:0xA8E68C, leaf:0x74C46A },
+  corn:       { key:'corn',       name:'ข้าวโพด',    emoji:'🌽', cost:100, sell:450,  time:20, exp:60,  minLevel:3, color:0xF6D341, leaf:0x4FA84F },
+  pumpkin:    { key:'pumpkin',    name:'ฟักทอง',     emoji:'🎃', cost:250, sell:1200, time:35, exp:150, minLevel:4, color:0xF2701F, leaf:0x4E9B4E },
+  strawberry: { key:'strawberry', name:'สตรอเบอร์รี่', emoji:'🍓', cost:600, sell:3500, time:60, exp:400, minLevel:5, color:0xE8365F, leaf:0x46A84E },
+};
+const CROP_ORDER = ['tomato','carrot','cabbage','corn','pumpkin','strawberry'];
+
+const MAIN_PLOTS_START = 6, MAIN_PLOTS_MAX = 12, PLOT_COST = 150;
+const HOUSE_COST = { 2: 300, 3: 800 };
+const MAX_DROPS = 5, DROPS_PER_QUIZ = 2;
+const BUFF_TIME = 10, BROKEN_TIME = 10, BUFF_MULT = 1.5;
+const ISLAND_UNLOCK = [
+  { level: 2, cost: 500  },
+  { level: 4, cost: 2000 },
+  { level: 6, cost: 5000 },
+];
+const AUTOSAVE_SEC = 20;
+
+const state = {
+  user: null, firstName: '', lastName: '',
+  money: 100,
+  inventory: {},
+  selectedSeed: 'tomato',
+  level: 1, exp: 0,
+  waterDrops: 0,
+  totalEarnings: 0,
+  unlockedPlots: MAIN_PLOTS_START,
+  houseLevel: 1,
+  islands: [false, false, false],
+  buffTimer: 0, brokenTimer: 0,
+  quizOpen: false, quizMode: 'robot',
+  bgmOn: false,
+};
+const expRequired = lvl => lvl * 100;
+
+/* =====================================================================
+   1. AUDIO (Tone.js SFX + BGM)
+   ===================================================================== */
+const Sfx = {
+  ready: false, bgmLoop: null,
+  async unlock() {
+    if (this.ready || typeof Tone === 'undefined') return;
+    try { await Tone.start(); } catch (e) { return; }
+    this.build(); this.ready = true;
+    if (state.bgmOn) this.bgmStart();
+  },
+  build() {
+    const T = Tone;
+    this.pop = new T.MembraneSynth({
+      pitchDecay: 0.035, octaves: 5, volume: -8,
+      oscillator: { type: 'sine' }, envelope: { attack: 0.001, decay: 0.22, sustain: 0, release: 0.1 }
+    }).toDestination();
+    this.bell = new T.PolySynth(T.Synth, {
+      volume: -12, oscillator: { type: 'triangle' },
+      envelope: { attack: 0.004, decay: 0.34, sustain: 0.02, release: 0.4 }
+    }).toDestination();
+    this.blip = new T.PolySynth(T.Synth, {
+      volume: -14, oscillator: { type: 'square8' },
+      envelope: { attack: 0.005, decay: 0.16, sustain: 0, release: 0.12 }
+    }).toDestination();
+    this.buzz = new T.Synth({
+      volume: -16, oscillator: { type: 'sawtooth' },
+      envelope: { attack: 0.01, decay: 0.35, sustain: 0.1, release: 0.15 }
+    }).toDestination();
+    this.noise = new T.NoiseSynth({
+      volume: -24, noise: { type: 'brown' }, envelope: { attack: 0.004, decay: 0.16, sustain: 0 }
+    }).toDestination();
+    this.bgmSynth = new T.PolySynth(T.Synth, {
+      volume: -22, oscillator: { type: 'triangle' },
+      envelope: { attack: 0.05, decay: 0.5, sustain: 0.1, release: 0.6 }
+    }).toDestination();
+    this.bassSynth = new T.Synth({
+      volume: -24, oscillator: { type: 'sine' },
+      envelope: { attack: 0.03, decay: 0.4, sustain: 0.05, release: 0.5 }
+    }).toDestination();
+  },
+  seq(synth, notes, dur = '16n', gap = 0.075) {
+    if (!this.ready) return;
+    const t = Tone.now();
+    notes.forEach((n, i) => { try { synth.triggerAttackRelease(n, dur, t + i * gap); } catch (e) {} });
+  },
+  plant()   { if (!this.ready) return; try { this.pop.triggerAttackRelease('C3', '16n'); } catch (e) {} this.seq(this.blip, ['E5'], '32n'); },
+  harvest() { this.seq(this.bell, ['E6','A6','C7'], '16n', 0.06); },
+  coin()    { this.seq(this.bell, ['C6','E6','G6','C7'], '32n', 0.055); if (this.ready) { try { this.noise.triggerAttackRelease('32n'); } catch (e) {} } },
+  water()   { this.seq(this.bell, ['A5','D6','A6'], '32n', 0.05); },
+  error() {
+    if (!this.ready) return;
+    try {
+      const t = Tone.now();
+      this.buzz.triggerAttackRelease('A3', 0.32, t);
+      this.buzz.frequency.setValueAtTime(220, t);
+      this.buzz.frequency.exponentialRampToValueAtTime(96, t + 0.3);
+    } catch (e) {}
+  },
+  correct() { this.seq(this.bell, ['C5','E5','G5','C6','E6'], '16n', 0.07); },
+  wrong() {
+    if (!this.ready) return;
+    try {
+      const t = Tone.now();
+      this.buzz.triggerAttackRelease('G2', 0.55, t);
+      this.buzz.frequency.setValueAtTime(150, t);
+      this.buzz.frequency.exponentialRampToValueAtTime(52, t + 0.5);
+      this.noise.triggerAttackRelease('8n', t);
+    } catch (e) {}
+  },
+  build()   { if (!this.ready) return; try { this.pop.triggerAttackRelease('G2', '8n'); } catch (e) {} this.seq(this.bell, ['G5','B5','D6'], '16n', 0.08); },
+  levelUp() { this.seq(this.bell, ['C5','E5','G5','C6','E6','G6','C7'], '16n', 0.075); },
+  click()   { this.seq(this.blip, ['A5'], '32n'); },
+
+  bgmStart() {
+    if (!this.ready || this.bgmLoop) return;
+    const mel  = ['C5','E5','G5','E5','A5','G5','E5','D5','C5','D5','E5','G5','A5','G5','E5','C5'];
+    const bass = ['C3','C3','F3','F3','A2','A2','G3','G3'];
+    let i = 0, j = 0;
+    Tone.Transport.bpm.value = 96;
+    this.bgmLoop = new Tone.Loop(time => {
+      try {
+        this.bgmSynth.triggerAttackRelease(mel[i % mel.length], '8n', time);
+        if (i % 2 === 0) this.bassSynth.triggerAttackRelease(bass[j++ % bass.length], '4n', time);
+        i++;
+      } catch (e) {}
+    }, '4n').start(0);
+    Tone.Transport.start();
+  },
+  bgmStop() {
+    if (this.bgmLoop) { this.bgmLoop.stop(); this.bgmLoop.dispose(); this.bgmLoop = null; }
+    try { Tone.Transport.stop(); } catch (e) {}
+  },
+};
+addEventListener('pointerdown', () => Sfx.unlock());
+addEventListener('keydown', () => Sfx.unlock());
+
+/* =====================================================================
+   2. THREE.JS SCENE SETUP
+   ===================================================================== */
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x63CBF2);
+scene.fog = new THREE.Fog(0x63CBF2, 75, 190);
+
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 400);
+camera.position.set(4, 14, 20);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(1.2, 1.0, 0.8);
+controls.enableDamping = true;
+controls.dampingFactor = 0.075;
+controls.minDistance = 9;
+controls.maxDistance = 60;
+controls.minPolarAngle = 0.18;
+controls.maxPolarAngle = Math.PI * 0.475;
+controls.enablePan = false;
+controls.rotateSpeed = 0.62;
+controls.zoomSpeed = 0.85;
+controls.update();
+
+scene.add(new THREE.HemisphereLight(0xdff6ff, 0x69b45a, 1.45));
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+
+const sun = new THREE.DirectionalLight(0xfff6e0, 2.35);
+sun.position.set(16, 26, 14);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 90;
+const SH = 22;
+sun.shadow.camera.left = -SH; sun.shadow.camera.right = SH;
+sun.shadow.camera.top = SH;   sun.shadow.camera.bottom = -SH;
+sun.shadow.bias = -0.0012;
+sun.shadow.normalBias = 0.03;
+scene.add(sun);
+scene.add(sun.target);
+
+/* =====================================================================
+   3. MATERIALS
+   ===================================================================== */
+const mat = (color, opts = {}) => new THREE.MeshLambertMaterial({ color, flatShading: true, ...opts });
+const MAT = {
+  grass: mat(0x7FD44F), sand: mat(0xF7E0A0), sandDark: mat(0xE7C878),
+  rock: mat(0x9AA3A8), soil: mat(0x5E3A20), soilFrame: mat(0x8A5A2E),
+  soilLocked: new THREE.MeshLambertMaterial({ color: 0x5f6f5a, flatShading: true, transparent: true, opacity: 0.32 }),
+  trunk: mat(0x8C5A2B), leafA: mat(0x2E8B4F), leafB: mat(0x3AA45E), leafC: mat(0x46B86C),
+  wall: mat(0xEDE0CB), wallB: mat(0xDCCBB0), roof: mat(0xF4732A), roofB: mat(0xE0561C),
+  door: mat(0x8B5A2B), window: mat(0x9FD8F0), chimney: mat(0xC7714B),
+  stone: mat(0xB9BEC2), stoneDark: mat(0x9AA0A5), water: mat(0x36A7E0), wood: mat(0x9E6B3A),
+  plank: mat(0xB98A4E), plankDark: mat(0x8E6534),
+  robotBody: mat(0xE8EEF2), robotBlue: mat(0x4FB6E8), robotDark: mat(0x3B4A55),
+  robotEye: new THREE.MeshBasicMaterial({ color: 0x2ee6ff }), metal: mat(0xB4C0C8),
+};
+
+/* =====================================================================
+   4. OCEAN ENVIRONMENT
+   ===================================================================== */
+const oceanGeo = new THREE.PlaneGeometry(420, 420, 72, 72);
+oceanGeo.rotateX(-Math.PI / 2);
+const ocean = new THREE.Mesh(oceanGeo, mat(0x3BAEE8));
+ocean.position.y = -2.15;
+scene.add(ocean);
+const oceanBase = Float32Array.from(oceanGeo.attributes.position.array);
+
+function waterHalo(x, z, r) {
+  const g = new THREE.CircleGeometry(r, 30);
+  g.rotateX(-Math.PI / 2);
+  const mesh = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: 0x9CE0F7, transparent: true, opacity: 0.24, depthWrite: false }));
+  mesh.position.set(x, -1.32, z);
+  mesh.renderOrder = 2;
+  scene.add(mesh);
+}
+
+/* =====================================================================
+   5. ISLANDS & WORLD BUILDERS
+   ===================================================================== */
+function makeIsland(radius, segments = 22) {
+  const g = new THREE.Group();
+  const grass = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius * 0.985, 1.5, segments), MAT.grass);
+  grass.position.y = -0.75; grass.receiveShadow = true; grass.castShadow = true; g.add(grass);
+  const sand = new THREE.Mesh(new THREE.CylinderGeometry(radius * 1.03, radius * 0.9, 1.1, segments), MAT.sand);
+  sand.position.y = -1.9; sand.receiveShadow = true; sand.castShadow = true; g.add(sand);
+  const under = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.9, radius * 0.16, 3.6, segments), MAT.sandDark);
+  under.position.y = -4.2; g.add(under);
+  const tip = new THREE.Mesh(new THREE.ConeGeometry(radius * 0.17, 2.2, segments), MAT.stoneDark);
+  tip.position.y = -7.05; tip.rotation.x = Math.PI; g.add(tip);
+  return g;
+}
+
+const swayTrees = [];
+function makeTree(scale = 1, variant = 0) {
+  const g = new THREE.Group();
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.22, 1.05, 7), MAT.trunk);
+  trunk.position.y = 0.52; trunk.castShadow = true; trunk.receiveShadow = true; g.add(trunk);
+  const crown = new THREE.Group();
+  if (variant === 0) {
+    const c1 = new THREE.Mesh(new THREE.ConeGeometry(0.98, 2.1, 8), MAT.leafA);
+    c1.position.y = 1.85; c1.castShadow = true; crown.add(c1);
+    const c2 = new THREE.Mesh(new THREE.ConeGeometry(0.72, 1.5, 8), MAT.leafB);
+    c2.position.y = 2.75; c2.castShadow = true; crown.add(c2);
+  } else if (variant === 1) {
+    const c1 = new THREE.Mesh(new THREE.ConeGeometry(1.05, 2.9, 8), MAT.leafB);
+    c1.position.y = 2.1; c1.castShadow = true; crown.add(c1);
+  } else {
+    const c1 = new THREE.Mesh(new THREE.IcosahedronGeometry(0.95, 0), MAT.leafC);
+    c1.position.y = 1.75; c1.castShadow = true; c1.scale.y = 1.15; crown.add(c1);
+    const c2 = new THREE.Mesh(new THREE.IcosahedronGeometry(0.62, 0), MAT.leafA);
+    c2.position.set(0.42, 1.25, 0.28); c2.castShadow = true; crown.add(c2);
+  }
+  g.add(crown);
+  g.scale.setScalar(scale);
+  g.userData.crown = crown;
+  g.userData.phase = Math.random() * Math.PI * 2;
+  g.userData.amp = 0.035 + Math.random() * 0.045;
+  swayTrees.push(g);
+  return g;
+}
+
+function makeRock(scale = 1) {
+  const r = new THREE.Mesh(new THREE.DodecahedronGeometry(0.5, 0), MAT.rock);
+  r.scale.set(scale * (0.8 + Math.random() * 0.6), scale * (0.6 + Math.random() * 0.4), scale * (0.8 + Math.random() * 0.6));
+  r.rotation.set(Math.random() * 3, Math.random() * 3, Math.random() * 3);
+  r.position.y = scale * 0.18;
+  r.castShadow = true; r.receiveShadow = true;
+  return r;
+}
+
+function pyramidRoof(radius, height, mtl) {
+  const m = new THREE.Mesh(new THREE.ConeGeometry(radius, height, 4), mtl);
+  m.rotation.y = Math.PI / 4;
+  m.castShadow = true; m.receiveShadow = true;
+  return m;
+}
+
+/* Main Island */
+const ISLAND_R = 9.4;
+scene.add(makeIsland(ISLAND_R, 24));
+waterHalo(0, 0, ISLAND_R + 3.4);
+
+function addTree(x, z, s, v, parent) {
+  const t = makeTree(s, v);
+  t.position.set(x, 0, z);
+  t.rotation.y = Math.random() * Math.PI * 2;
+  (parent || scene).add(t);
+  return t;
+}
+[[-6.6,-3.2,1.15,0],[-4.4,-5.6,.95,1],[3.3,-6.6,1.05,0],[6.9,-3.0,1.2,1],[7.3,1.4,1.0,0],
+ [6.4,5.9,1.1,2],[-7.4,1.9,1.0,2],[-5.6,5.2,1.05,0],[-1.2,7.0,.9,1],[2.4,7.2,.95,0]]
+  .forEach(([x,z,s,v]) => addTree(x, z, s, v));
+[[-3.6,4.9,1.0],[6.2,3.1,.85],[1.1,-7.4,.7],[-7.6,-.6,.75]]
+  .forEach(([x,z,s]) => { const r = makeRock(s); r.position.x = x; r.position.z = z; scene.add(r); });
+
+/* Side Islands */
+const SIDE_R = 6.2;
+const SIDE_ISLANDS = [
+  { center: new THREE.Vector3(-19.5, 0, -13.5) },
+  { center: new THREE.Vector3(20.5, 0, -9.5) },
+  { center: new THREE.Vector3(-11.5, 0, 19.5) },
+];
+SIDE_ISLANDS.forEach((si, k) => {
+  const g = new THREE.Group();
+  g.add(makeIsland(SIDE_R, 18));
+  for (let i = 0; i < 4; i++) {
+    const a = (i / 4) * Math.PI * 2 + k;
+    addTree(Math.cos(a) * (SIDE_R - 1.5), Math.sin(a) * (SIDE_R - 1.5), 0.8 + Math.random() * 0.35, i % 3, g);
+  }
+  const rk = makeRock(0.7); rk.position.set(SIDE_R * 0.35, 0, -SIDE_R * 0.45); g.add(rk);
+  g.position.copy(si.center);
+  scene.add(g);
+  waterHalo(si.center.x, si.center.z, SIDE_R + 2.4);
+  si.group = g;
+});
+
+/* Bridges */
+const bridges = [];
+SIDE_ISLANDS.forEach((si, k) => {
+  const dir = si.center.clone().setY(0).normalize();
+  const from = dir.clone().multiplyScalar(ISLAND_R - 0.4);
+  const to = si.center.clone().sub(dir.clone().multiplyScalar(SIDE_R - 0.4));
+  const len = from.distanceTo(to);
+  const g = new THREE.Group();
+  const nPlank = Math.max(4, Math.round(len / 0.62));
+  for (let i = 0; i < nPlank; i++) {
+    const p = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.14, 2.0), i % 2 ? MAT.plank : MAT.plankDark);
+    p.position.set(-len / 2 + 0.31 + i * (len / nPlank), -0.1, 0);
+    p.castShadow = true; p.receiveShadow = true;
+    g.add(p);
+  }
+  [-0.92, 0.92].forEach(off => {
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(len, 0.12, 0.12), MAT.wood);
+    rail.position.set(0, 0.52, off); rail.castShadow = true; g.add(rail);
+    const nPost = Math.max(2, Math.round(len / 2.4));
+    for (let i = 0; i <= nPost; i++) {
+      const post = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.72, 0.13), MAT.wood);
+      post.position.set(-len / 2 + i * (len / nPost), 0.22, off); post.castShadow = true; g.add(post);
+    }
+  });
+  const mid = from.clone().add(to).multiplyScalar(0.5);
+  g.position.set(mid.x, 0, mid.z);
+  g.rotation.y = Math.atan2(to.z - from.z, to.x - from.x) * -1;
+  g.visible = false;
+  scene.add(g);
+  bridges.push({ group: g, from, to, len, index: k });
+});
+
+/* =====================================================================
+   6. HOUSE & CHIMNEY SMOKE
+   ===================================================================== */
+const HOUSE_POS = new THREE.Vector3(-0.6, 0, -5.4);
+let houseGroup = null;
+const chimneyPos = new THREE.Vector3();
+
+function buildHouse(level) {
+  if (houseGroup) scene.remove(houseGroup);
+  const g = new THREE.Group();
+
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(3.1, 2.0, 2.6), MAT.wall);
+  wall.position.y = 1.0; wall.castShadow = true; wall.receiveShadow = true; g.add(wall);
+  const roof = pyramidRoof(2.75, 1.55, MAT.roof);
+  roof.position.y = 2.78; g.add(roof);
+  const door = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.15, 0.12), MAT.door);
+  door.position.set(0.35, 0.575, 1.32); g.add(door);
+  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 5), MAT.metal);
+  knob.position.set(0.62, 0.62, 1.4); g.add(knob);
+  const win1 = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.62, 0.1), MAT.window);
+  win1.position.set(-0.85, 1.2, 1.32); g.add(win1);
+
+  let chim = new THREE.Mesh(new THREE.BoxGeometry(0.46, 1.5, 0.46), MAT.chimney);
+  chim.position.set(-0.95, 3.05, -0.35); chim.castShadow = true; g.add(chim);
+  let chimTop = new THREE.Vector3(-0.95, 3.85, -0.35);
+
+  if (level >= 2) {
+    const wing = new THREE.Mesh(new THREE.BoxGeometry(1.9, 1.7, 2.1), MAT.wallB);
+    wing.position.set(2.4, 0.85, 0.15); wing.castShadow = true; wing.receiveShadow = true; g.add(wing);
+    const wingRoof = pyramidRoof(1.85, 1.15, MAT.roofB);
+    wingRoof.position.set(2.4, 2.3, 0.15); g.add(wingRoof);
+    const win2 = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.52, 0.1), MAT.window);
+    win2.position.set(2.4, 1.05, 1.22); g.add(win2);
+    for (let i = 0; i < 6; i++) {
+      const p = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.62, 0.13), MAT.wood);
+      p.position.set(-2.0 + i * 0.42, 0.31, 1.75); p.castShadow = true; g.add(p);
+    }
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.1, 0.1), MAT.wood);
+    bar.position.set(-0.95, 0.45, 1.75); g.add(bar);
+  }
+
+  if (level >= 3) {
+    g.remove(roof);
+    const floor2 = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.6, 2.2), MAT.wall);
+    floor2.position.set(-0.15, 3.05, 0); floor2.castShadow = true; floor2.receiveShadow = true; g.add(floor2);
+    const bigRoof = pyramidRoof(2.6, 1.6, MAT.roof);
+    bigRoof.position.set(-0.15, 4.6, 0); g.add(bigRoof);
+    const band = new THREE.Mesh(new THREE.BoxGeometry(3.35, 0.22, 2.85), MAT.roofB);
+    band.position.y = 2.08; band.castShadow = true; g.add(band);
+    const win3 = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.1), MAT.window);
+    win3.position.set(-0.15, 3.1, 1.12); g.add(win3);
+    const balc = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.14, 0.7), MAT.wood);
+    balc.position.set(-0.15, 2.3, 1.5); balc.castShadow = true; g.add(balc);
+    for (let i = 0; i < 4; i++) {
+      const p = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.42, 0.1), MAT.wood);
+      p.position.set(-0.85 + i * 0.47, 2.55, 1.78); p.castShadow = true; g.add(p);
+    }
+    const tower = new THREE.Mesh(new THREE.CylinderGeometry(0.72, 0.8, 2.6, 8), MAT.wallB);
+    tower.position.set(-2.35, 1.3, 0.3); tower.castShadow = true; g.add(tower);
+    const towerRoof = new THREE.Mesh(new THREE.ConeGeometry(0.98, 1.3, 8), MAT.roofB);
+    towerRoof.position.set(-2.35, 3.2, 0.3); towerRoof.castShadow = true; g.add(towerRoof);
+    g.remove(chim);
+    chim = new THREE.Mesh(new THREE.BoxGeometry(0.52, 1.8, 0.52), MAT.chimney);
+    chim.position.set(1.05, 4.6, -0.55); chim.castShadow = true; g.add(chim);
+    chimTop = new THREE.Vector3(1.05, 5.6, -0.55);
+  }
+
+  g.position.copy(HOUSE_POS);
+  g.rotation.y = -0.24;
+  scene.add(g);
+  houseGroup = g;
+  chimneyPos.copy(chimTop).applyEuler(g.rotation).add(HOUSE_POS);
+  return g;
+}
+buildHouse(1);
+
+const smokePool = [];
+const smokeGeo = new THREE.IcosahedronGeometry(0.2, 0);
+for (let i = 0; i < 34; i++) {
+  const m = new THREE.Mesh(smokeGeo, new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true, transparent: true, opacity: 0 }));
+  m.visible = false; scene.add(m);
+  smokePool.push({ mesh: m, life: 0, max: 0, vx: 0, vz: 0 });
+}
+let smokeTimer = 0;
+function emitSmoke() {
+  const p = smokePool.find(s => s.life <= 0);
+  if (!p) return;
+  p.life = p.max = 2.6 + Math.random() * 1.1;
+  p.vx = (Math.random() - 0.5) * 0.22;
+  p.vz = (Math.random() - 0.5) * 0.22;
+  p.mesh.position.copy(chimneyPos).add(new THREE.Vector3((Math.random()-.5)*.16, 0.15, (Math.random()-.5)*.16));
+  p.mesh.visible = true;
+  p.mesh.rotation.set(Math.random()*3, Math.random()*3, Math.random()*3);
+  p.mesh.scale.setScalar(0.42);
+}
+
+/* =====================================================================
+   7. WATER WELL
+   ===================================================================== */
+const WELL_POS = new THREE.Vector3(-4.9, 0, -0.4);
+const pickables = [];
+const well = (() => {
+  const g = new THREE.Group();
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.92, 1.0, 0.9, 10), MAT.stone);
+  base.position.y = 0.45; base.castShadow = true; base.receiveShadow = true; g.add(base);
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.11, 5, 10), MAT.stoneDark);
+  rim.rotation.x = Math.PI / 2; rim.position.y = 0.92; rim.castShadow = true; g.add(rim);
+  const w = new THREE.Mesh(new THREE.CylinderGeometry(0.78, 0.78, 0.1, 10), MAT.water);
+  w.position.y = 0.8; g.add(w); g.userData.water = w;
+  [-0.72, 0.72].forEach(x => {
+    const p = new THREE.Mesh(new THREE.BoxGeometry(0.16, 1.5, 0.16), MAT.wood);
+    p.position.set(x, 1.6, 0); p.castShadow = true; g.add(p);
+  });
+  const roof = pyramidRoof(1.25, 0.72, MAT.roofB);
+  roof.position.y = 2.62; g.add(roof);
+  const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 1.5, 6), MAT.wood);
+  bar.rotation.z = Math.PI / 2; bar.position.y = 2.2; g.add(bar);
+  const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.75, 4), MAT.trunk);
+  rope.position.set(0, 1.83, 0); g.add(rope);
+  const bucket = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.15, 0.26, 7), MAT.wood);
+  bucket.position.set(0, 1.38, 0); bucket.castShadow = true; g.add(bucket); g.userData.bucket = bucket;
+
+  const hit = new THREE.Mesh(new THREE.CylinderGeometry(1.35, 1.35, 3.0, 8), new THREE.MeshBasicMaterial({ visible: false }));
+  hit.position.y = 1.5; hit.userData.pick = { type: 'well' };
+  g.add(hit); pickables.push(hit);
+
+  g.position.copy(WELL_POS);
+  scene.add(g);
+  return g;
+})();
+const WELL_LABEL_POS = WELL_POS.clone().add(new THREE.Vector3(0, 3.3, 0));
+
+/* =====================================================================
+   8. FARM PLOTS
+   ===================================================================== */
+const PLOT_SIZE = 1.62, PLOT_GAP = 1.78;
+const plots = [];
+const plotsGroup = new THREE.Group();
+scene.add(plotsGroup);
+
+const barGeoBg = new THREE.PlaneGeometry(1.02, 0.2);
+const barGeoFill = new THREE.PlaneGeometry(1.0, 0.15);
+barGeoFill.translate(0.5, 0, 0);
+
+function makeProgressBar() {
+  const g = new THREE.Group();
+  const bg = new THREE.Mesh(barGeoBg, new THREE.MeshBasicMaterial({ color: 0x22333d, depthTest: false, transparent: true, opacity: 0.92 }));
+  bg.renderOrder = 900; g.add(bg);
+  const fill = new THREE.Mesh(barGeoFill, new THREE.MeshBasicMaterial({ color: 0x4CE08A, depthTest: false }));
+  fill.position.set(-0.5, 0, 0.002); fill.renderOrder = 901; g.add(fill);
+  g.userData.fill = fill;
+  g.visible = false;
+  return g;
+}
+
+function createPlot(px, pz, islandIdx, orderIdx) {
+  const group = new THREE.Group();
+  group.position.set(px, 0, pz);
+
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(PLOT_SIZE, 0.2, PLOT_SIZE), MAT.soilFrame);
+  frame.position.y = 0.1; frame.receiveShadow = true; frame.castShadow = true; group.add(frame);
+  const soil = new THREE.Mesh(new THREE.BoxGeometry(PLOT_SIZE - 0.22, 0.24, PLOT_SIZE - 0.22), MAT.soil);
+  soil.position.y = 0.13; soil.receiveShadow = true; group.add(soil);
+  const lockPlate = new THREE.Mesh(new THREE.BoxGeometry(PLOT_SIZE, 0.12, PLOT_SIZE), MAT.soilLocked);
+  lockPlate.position.y = 0.06; group.add(lockPlate);
+
+  const bar = makeProgressBar();
+  bar.position.set(0, 1.15, 0); group.add(bar);
+  const cropAnchor = new THREE.Group();
+  cropAnchor.position.y = 0.24; group.add(cropAnchor);
+
+  plotsGroup.add(group);
+
+  const P = {
+    group, frame, soil, lockPlate, bar, cropAnchor,
+    island: islandIdx, order: orderIdx, unlocked: false,
+    crop: null, model: null, grow: 0, growTime: 0, ready: false, readyT: 0,
+    world: new THREE.Vector3(px, 0.5, pz),
+  };
+  const pick = { type: 'plot', ref: P };
+  frame.userData.pick = pick; soil.userData.pick = pick; lockPlate.userData.pick = pick;
+  pickables.push(frame, soil, lockPlate);
+  plots.push(P);
+  return P;
+}
+
+/* Main Island Plots */
+const GRID_ORIGIN = new THREE.Vector3(2.35, 0, 1.55);
+const MAIN_ORDER = [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[3,0],[3,1],[0,2],[1,2],[2,2],[3,2]];
+MAIN_ORDER.forEach(([cx, cz], i) => {
+  createPlot(GRID_ORIGIN.x + (cx - 1.5) * PLOT_GAP, GRID_ORIGIN.z + (cz - 1) * PLOT_GAP, -1, i);
+});
+
+/* Side Island Plots */
+SIDE_ISLANDS.forEach((si, k) => {
+  let i = 0;
+  for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) {
+    createPlot(si.center.x + (c - 1) * PLOT_GAP, si.center.z + (r - 0.5) * PLOT_GAP + 1.2, k, i++);
+  }
+});
+
+function refreshPlotLocks() {
+  for (const P of plots) {
+    P.unlocked = P.island === -1 ? P.order < state.unlockedPlots : state.islands[P.island];
+    P.frame.visible = P.unlocked;
+    P.soil.visible = P.unlocked;
+    P.lockPlate.visible = !P.unlocked && (P.island === -1 || state.level >= ISLAND_UNLOCK[P.island].level);
+  }
+}
+
+/* =====================================================================
+   9. CROP PROCEDURAL MESH GENERATION
+   ===================================================================== */
+function createCrop(type) {
+  const c = CROPS[type];
+  const g = new THREE.Group();
+  const fruits = [];
+  const bodyMat = mat(c.color);
+  const leafMat = mat(c.leaf);
+
+  if (type === 'tomato') {
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.075, 0.62, 5), leafMat);
+    stem.position.y = 0.31; stem.castShadow = true; g.add(stem);
+    for (let i = 0; i < 3; i++) {
+      const l = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.3, 4), leafMat);
+      const a = (i / 3) * Math.PI * 2;
+      l.position.set(Math.cos(a) * 0.22, 0.56, Math.sin(a) * 0.22);
+      l.rotation.set(Math.PI * 0.22 * Math.cos(a + 1.6), a, Math.PI * 0.22 * Math.sin(a));
+      l.castShadow = true; g.add(l);
+    }
+    for (let i = 0; i < 2; i++) {
+      const f = new THREE.Mesh(new THREE.IcosahedronGeometry(0.2, 0), bodyMat);
+      f.position.set(i === 0 ? -0.19 : 0.2, 0.24 + i * 0.14, i === 0 ? 0.12 : -0.14);
+      f.castShadow = true; f.scale.setScalar(0.001); g.add(f); fruits.push(f);
+    }
+  } else if (type === 'carrot') {
+    const body = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.72, 7), bodyMat);
+    body.rotation.x = Math.PI; body.position.y = 0.3; body.castShadow = true;
+    body.scale.setScalar(0.001); g.add(body); fruits.push(body);
+    for (let i = 0; i < 4; i++) {
+      const l = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.42, 4), leafMat);
+      const a = (i / 4) * Math.PI * 2;
+      l.position.set(Math.cos(a) * 0.09, 0.68, Math.sin(a) * 0.09);
+      l.rotation.set(0.25 * Math.cos(a), a, 0.25 * Math.sin(a));
+      l.castShadow = true; g.add(l);
+    }
+  } else if (type === 'cabbage') {
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.38, 1), bodyMat);
+    core.position.y = 0.28; core.castShadow = true; core.scale.setScalar(0.001); g.add(core); fruits.push(core);
+    for (let i = 0; i < 5; i++) {
+      const l = new THREE.Mesh(new THREE.DodecahedronGeometry(0.32, 0), leafMat);
+      const a = (i / 5) * Math.PI * 2;
+      l.position.set(Math.cos(a) * 0.22, 0.18, Math.sin(a) * 0.22);
+      l.scale.set(1.1, 0.4, 1.1); l.castShadow = true; g.add(l);
+    }
+  } else if (type === 'corn') {
+    const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.08, 1.15, 6), leafMat);
+    stalk.position.y = 0.58; stalk.castShadow = true; g.add(stalk);
+    for (let i = 0; i < 4; i++) {
+      const l = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.52, 4), leafMat);
+      const a = (i / 4) * Math.PI * 2;
+      l.position.set(Math.cos(a) * 0.18, 0.4 + i * 0.18, Math.sin(a) * 0.18);
+      l.rotation.set(0.4 * Math.cos(a), a, 0.4 * Math.sin(a));
+      l.castShadow = true; g.add(l);
+    }
+    const ear = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.11, 0.52, 7), bodyMat);
+    ear.position.set(0.14, 0.62, 0.05); ear.rotation.z = -0.32; ear.castShadow = true;
+    ear.scale.setScalar(0.001); g.add(ear); fruits.push(ear);
+  } else if (type === 'pumpkin') {
+    const body = new THREE.Mesh(new THREE.DodecahedronGeometry(0.48, 1), bodyMat);
+    body.position.y = 0.32; body.scale.set(1.22, 0.85, 1.22); body.castShadow = true;
+    body.scale.setScalar(0.001); g.add(body); fruits.push(body);
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.22, 5), leafMat);
+    stem.position.set(0, 0.65, 0); stem.rotation.z = 0.2; stem.castShadow = true; g.add(stem);
+  } else if (type === 'strawberry') {
+    const bush = new THREE.Mesh(new THREE.DodecahedronGeometry(0.35, 0), leafMat);
+    bush.position.y = 0.28; bush.scale.y = 0.72; bush.castShadow = true; g.add(bush);
+    for (let i = 0; i < 3; i++) {
+      const f = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.24, 5), bodyMat);
+      const a = (i / 3) * Math.PI * 2;
+      f.rotation.x = Math.PI;
+      f.position.set(Math.cos(a) * 0.22, 0.18, Math.sin(a) * 0.22);
+      f.castShadow = true; f.scale.setScalar(0.001); g.add(f); fruits.push(f);
+    }
+  }
+
+  return { group: g, fruits };
+}
+
+/* =====================================================================
+   10. ROBOT CHARACTER (ANIMATED)
+   ===================================================================== */
+const robotGroup = new THREE.Group();
+const robotWorldPos = new THREE.Vector3(0, 0, 1.8);
+robotGroup.position.copy(robotWorldPos);
+scene.add(robotGroup);
+
+const robotParts = (() => {
+  const base = new THREE.Group();
+  robotGroup.add(base);
+
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.38, 0.75, 10), MAT.robotBody);
+  body.position.y = 0.68; body.castShadow = true; base.add(body);
+  const stripe = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.46, 0.15, 10), MAT.robotBlue);
+  stripe.position.y = 0.68; base.add(stripe);
+
+  const headGroup = new THREE.Group();
+  headGroup.position.y = 1.25;
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.52, 0.58), MAT.robotBody);
+  head.castShadow = true; headGroup.add(head);
+  const vis = new THREE.Mesh(new THREE.BoxGeometry(0.54, 0.26, 0.12), MAT.robotDark);
+  vis.position.set(0, 0.04, 0.26); headGroup.add(vis);
+
+  const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.1, 0.04), MAT.robotEye);
+  eyeL.position.set(-0.16, 0.04, 0.31); headGroup.add(eyeL);
+  const eyeR = eyeL.clone(); eyeR.position.x = 0.16; headGroup.add(eyeR);
+
+  const antStem = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.32, 5), MAT.metal);
+  antStem.position.y = 0.42; headGroup.add(antStem);
+  const antTip = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 6), MAT.robotBlue);
+  antTip.position.y = 0.58; headGroup.add(antTip);
+  base.add(headGroup);
+
+  const makeArm = side => {
+    const g = new THREE.Group();
+    g.position.set(side * 0.52, 0.88, 0);
+    const sh = new THREE.Mesh(new THREE.SphereGeometry(0.11, 7, 6), MAT.robotBlue); g.add(sh);
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.48, 6), MAT.robotBody);
+    arm.position.y = -0.24; arm.castShadow = true; g.add(arm);
+    const hand = new THREE.Mesh(new THREE.SphereGeometry(0.09, 7, 6), MAT.robotDark);
+    hand.position.y = -0.52; g.add(hand);
+    base.add(g);
+    return g;
+  };
+  const armL = makeArm(-1), armR = makeArm(1);
+
+  const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.35, 12), MAT.robotDark);
+  wheel.rotation.z = Math.PI / 2; wheel.position.y = 0.22; wheel.castShadow = true; base.add(wheel);
+
+  const shadow = new THREE.Mesh(new THREE.CircleGeometry(0.62, 16), new THREE.MeshBasicMaterial({ color: 0x123020, transparent: true, opacity: 0.26, depthWrite: false }));
+  shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.02; robotGroup.add(shadow);
+
+  const hit = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 1.8, 8), new THREE.MeshBasicMaterial({ visible: false }));
+  hit.position.y = 0.9; hit.userData.pick = { type: 'robot' };
+  robotGroup.add(hit); pickables.push(hit);
+
+  return { base, headGroup, eyeL, eyeR, antTip, armL, armR, wheel };
+})();
+
+/* =====================================================================
+   11. CONTROLS (KEYBOARD + JOYSTICK + TOUCH TABS)
+   ===================================================================== */
+const keys = { w: false, a: false, s: false, d: false };
+addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  if (k === 'w' || k === 'arrowup') keys.w = true;
+  if (k === 'a' || k === 'arrowleft') keys.a = true;
+  if (k === 's' || k === 'arrowdown') keys.s = true;
+  if (k === 'd' || k === 'arrowright') keys.d = true;
+});
+addEventListener('keyup', e => {
+  const k = e.key.toLowerCase();
+  if (k === 'w' || k === 'arrowup') keys.w = false;
+  if (k === 'a' || k === 'arrowleft') keys.a = false;
+  if (k === 's' || k === 'arrowdown') keys.s = false;
+  if (k === 'd' || k === 'arrowright') keys.d = false;
+});
+
+const joy = { active: false, dx: 0, dy: 0, id: null };
+const joyEl = document.getElementById('joystick');
+const knobEl = document.getElementById('knob');
+
+if ('ontouchstart' in window) document.body.classList.add('touch');
+
+joyEl.addEventListener('touchstart', e => {
+  const t = e.changedTouches[0];
+  joy.active = true; joy.id = t.identifier;
+  updateJoy(t);
+}, { passive: false });
+
+addEventListener('touchmove', e => {
+  if (!joy.active) return;
+  for (const t of e.changedTouches) {
+    if (t.identifier === joy.id) { updateJoy(t); break; }
+  }
+}, { passive: false });
+
+const resetJoy = () => {
+  joy.active = false; joy.dx = 0; joy.dy = 0; joy.id = null;
+  knobEl.style.transform = 'translate(-50%, -50%)';
+};
+addEventListener('touchend', e => {
+  for (const t of e.changedTouches) if (t.identifier === joy.id) resetJoy();
+});
+addEventListener('touchcancel', resetJoy);
+
+function updateJoy(touch) {
+  const rect = joyEl.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  let dx = touch.clientX - cx;
+  let dy = touch.clientY - cy;
+  const maxR = rect.width / 2 - 12;
+  const dist = Math.hypot(dx, dy);
+  if (dist > maxR) { dx = (dx / dist) * maxR; dy = (dy / dist) * maxR; }
+  knobEl.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+  joy.dx = dx / maxR; joy.dy = dy / maxR;
+}
+
+/* Mobile HUD/Shop Toggles */
+const hudColEl = document.getElementById('hudCol');
+const shopEl = document.getElementById('shop');
+document.getElementById('mLeft').addEventListener('click', () => {
+  Sfx.click();
+  hudColEl.classList.toggle('collapsed');
+  shopEl.classList.add('collapsed');
+});
+document.getElementById('mRight').addEventListener('click', () => {
+  Sfx.click();
+  shopEl.classList.toggle('collapsed');
+  hudColEl.classList.add('collapsed');
+});
+
+/* =====================================================================
+   12. RAYCASTING & CLICK INTERACTION
+   ===================================================================== */
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let pointerStart = { x: 0, y: 0, t: 0 };
+
+addEventListener('pointerdown', e => { pointerStart = { x: e.clientX, y: e.clientY, t: Date.now() }; });
+addEventListener('pointerup', e => {
+  if (state.quizOpen) return;
+  const dx = Math.abs(e.clientX - pointerStart.x);
+  const dy = Math.abs(e.clientY - pointerStart.y);
+  if (dx > 7 || dy > 7 || Date.now() - pointerStart.t > 450) return;
+  mouse.x = (e.clientX / innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(pickables, false);
+  if (hits.length > 0) {
+    const data = hits[0].object.userData.pick;
+    if (data) onObjectClicked(data);
+  }
+});
+
+function onObjectClicked(data) {
+  if (data.type === 'robot') {
+    if (state.brokenTimer > 0) {
+      showFx('🤖 หุ่นยนต์กำลังซ่อมแซม...', robotWorldPos, '#FF7A6B');
+      Sfx.error();
+    } else {
+      openQuiz('robot');
+    }
+  } else if (data.type === 'well') {
+    openQuiz('well');
+  } else if (data.type === 'plot') {
+    handlePlotClick(data.ref);
+  }
+}
+
+function handlePlotClick(P) {
+  if (!P.unlocked) {
+    showFx('🔒 แปลงนี้ยังไม่ปลดล็อค', P.world, '#FF7A6B');
+    Sfx.error();
+    return;
+  }
+
+  if (!P.crop) {
+    const c = CROPS[state.selectedSeed];
+    if (!c) return;
+    if (state.level < c.minLevel) {
+      showFx(`🔒 ต้องใช้ Lv.${c.minLevel}`, P.world, '#FF7A6B');
+      Sfx.error();
+      return;
+    }
+    if (state.money < c.cost) {
+      showFx('🪙 เงินไม่พอ!', P.world, '#FF7A6B');
+      Sfx.error();
+      return;
+    }
+    state.money -= c.cost;
+    P.crop = c.key;
+    P.grow = 0;
+    P.growTime = c.time;
+    P.ready = false;
+    const modelData = createCrop(c.key);
+    P.model = modelData.group;
+    P.modelData = modelData;
+    P.cropAnchor.add(P.model);
+    P.bar.visible = true;
+    updatePlotBar(P);
+    Sfx.plant();
+    showFx(`-${c.cost} 🪙`, P.world, '#FF8A7A');
+    renderUI();
+  } else if (!P.ready) {
+    if (state.waterDrops > 0) {
+      state.waterDrops--;
+      P.grow = P.growTime;
+      P.ready = true;
+      P.bar.visible = false;
+      if (P.model) P.model.scale.setScalar(1.0);
+      P.modelData.fruits.forEach(f => f.scale.setScalar(1.0));
+      P.readyT = Date.now();
+      Sfx.water();
+      showFx('💧 โตเต็มที่ทันที!', P.world, '#4FB6E8');
+      renderUI();
+    } else {
+      showFx('⏳ กำลังเติบโต... (กดบ่อน้ำเอา 💧)', P.world, '#FFE45C');
+      Sfx.click();
+    }
+  } else {
+    const c = CROPS[P.crop];
+    state.inventory[P.crop] = (state.inventory[P.crop] || 0) + 1;
+    addExp(c.exp);
+    showFx(`+1 ${c.emoji} (${c.exp} EXP)`, P.world, '#35B77E');
+    Sfx.harvest();
+
+    P.cropAnchor.remove(P.model);
+    P.crop = null; P.model = null; P.modelData = null; P.ready = false; P.grow = 0;
+    P.bar.visible = false;
+    renderUI();
+  }
+}
+
+function updatePlotBar(P) {
+  const pct = Math.min(1, P.grow / P.growTime);
+  P.bar.userData.fill.scale.x = pct;
+}
+
+/* =====================================================================
+   13. UI RENDERER & SHOP & UPGRADES
+   ===================================================================== */
+function renderUI() {
+  document.getElementById('moneyVal').textContent = state.money.toLocaleString();
+  const totalInv = Object.values(state.inventory).reduce((a, b) => a + b, 0);
+  document.getElementById('invVal').textContent = totalInv;
+  document.getElementById('sellBtn').disabled = totalInv === 0;
+
+  let totalSellVal = 0;
+  for (const [k, v] of Object.entries(state.inventory)) totalSellVal += (CROPS[k]?.sell || 0) * v;
+  document.getElementById('earnLine').textContent = `ยอดขายคลัง: ${totalSellVal.toLocaleString()} เหรียญ (สะสม: ${state.totalEarnings.toLocaleString()})`;
+
+  document.getElementById('lvBadge').textContent = `Lv.${state.level}`;
+  const req = expRequired(state.level);
+  document.getElementById('expText').textContent = `${state.exp}/${req}`;
+  document.getElementById('expBar').style.width = `${Math.min(100, (state.exp / req) * 100)}%`;
+
+  document.getElementById('waterVal').textContent = state.waterDrops;
+  const dropRow = document.getElementById('dropRow');
+  dropRow.innerHTML = '';
+  for (let i = 0; i < MAX_DROPS; i++) {
+    const span = document.createElement('span');
+    span.className = `drop ${i < state.waterDrops ? 'on' : ''}`;
+    span.textContent = '💧';
+    dropRow.appendChild(span);
+  }
+
+  renderShop();
+}
+
+function renderShop() {
+  const tabSeeds = document.getElementById('tabSeeds');
+  tabSeeds.innerHTML = '';
+  for (const k of CROP_ORDER) {
+    const c = CROPS[k];
+    const locked = state.level < c.minLevel;
+    const card = document.createElement('div');
+    card.className = `card ${state.selectedSeed === k ? 'selected' : ''} ${locked ? 'dim' : ''}`;
+    card.innerHTML = `
+      <div class="row1"><span class="cname">${c.emoji} ${c.name}</span><span class="csell">ขาย ${c.sell} 🪙</span></div>
+      <div class="row2"><span class="ccost">ซื้อ ${c.cost} 🪙</span><span class="cmeta">⏳ ${c.time}s</span><span class="cexp">+${c.exp} EXP</span></div>
+      ${locked ? `<div class="cdesc" style="color:#E0453C">🔒 ต้องการ Level ${c.minLevel}</div>` : ''}
+    `;
+    card.addEventListener('click', () => {
+      Sfx.click();
+      state.selectedSeed = k;
+      renderShop();
+    });
+    tabSeeds.appendChild(card);
+  }
+
+  const tabBuild = document.getElementById('tabBuild');
+  tabBuild.innerHTML = '';
+
+  /* Plot Upgrade */
+  const plotCard = document.createElement('div');
+  plotCard.className = 'card build';
+  if (state.unlockedPlots < MAIN_PLOTS_MAX) {
+    const cost = PLOT_COST * (state.unlockedPlots - MAIN_PLOTS_START + 1);
+    plotCard.innerHTML = `
+      <div class="row1"><span class="cname">🌱 ขยายแปลงผัก (${state.unlockedPlots}/${MAIN_PLOTS_MAX})</span></div>
+      <div class="row2"><span class="ccost">ราคา ${cost} 🪙</span></div>
+      <div class="cdesc">เพิ่มแปลงปลูกบนเกาะหลัก +1 ช่อง</div>
+    `;
+    plotCard.addEventListener('click', () => buyUpgrade('plot', cost));
+  } else {
+    plotCard.innerHTML = `
+      <div class="row1"><span class="cname">🌱 ขยายแปลงผัก</span><span class="csell">MAX</span></div>
+      <div class="cdesc">เกาะหลักขยายแปลงครบ 12 ช่องแล้ว</div>
+    `;
+  }
+  tabBuild.appendChild(plotCard);
+
+  /* House Upgrade */
+  const houseCard = document.createElement('div');
+  houseCard.className = 'card build';
+  if (state.houseLevel < 3) {
+    const nextLv = state.houseLevel + 1;
+    const cost = HOUSE_COST[nextLv];
+    houseCard.innerHTML = `
+      <div class="row1"><span class="cname">🏡 อัปเกรดบ้าน (Lv.${state.houseLevel} → ${nextLv})</span></div>
+      <div class="row2"><span class="ccost">ราคา ${cost} 🪙</span></div>
+      <div class="cdesc">${nextLv === 2 ? 'ขยายปีกบ้านไม้ด้านข้าง' : 'เพิ่มชั้นสอง + หอคอยสุดหรู'}</div>
+    `;
+    houseCard.addEventListener('click', () => buyUpgrade('house', cost));
+  } else {
+    houseCard.innerHTML = `
+      <div class="row1"><span class="cname">🏡 บ้านเกษตรกร</span><span class="csell">MAX</span></div>
+      <div class="cdesc">บ้านเลเวลสูงสุดแล้ว (คฤหาสน์ 2 ชั้น)</div>
+    `;
+  }
+  tabBuild.appendChild(houseCard);
+
+  /* Island Unlocks */
+  const head = document.createElement('div');
+  head.className = 'shopHead';
+  head.textContent = '🏝️ ขยายเกาะบริวาร (+6 ช่อง/เกาะ)';
+  tabBuild.appendChild(head);
+
+  SIDE_ISLANDS.forEach((si, idx) => {
+    const unl = ISLAND_UNLOCK[idx];
+    const unlocked = state.islands[idx];
+    const card = document.createElement('div');
+    card.className = `card build ${unlocked ? 'selected' : ''}`;
+    if (unlocked) {
+      card.innerHTML = `
+        <div class="row1"><span class="cname">🏝️ เกาะที่ ${idx + 2}</span><span class="csell">ปลดล็อคแล้ว</span></div>
+        <div class="cdesc">เปิดใช้งานแปลงปลูก 6 ช่อง + สะพานเดินข้าม</div>
+      `;
+    } else {
+      const lvOk = state.level >= unl.level;
+      card.innerHTML = `
+        <div class="row1"><span class="cname">🏝️ เกาะที่ ${idx + 2}</span></div>
+        <div class="row2"><span class="ccost">ราคา ${unl.cost} 🪙</span><span class="cmeta">Lv.${unl.level}</span></div>
+        <div class="cdesc">${lvOk ? 'กดเพื่อซื้อและสร้างสะพานเชื่อม' : `🔒 ต้องการ Level ${unl.level}`}</div>
+      `;
+      card.addEventListener('click', () => buyUpgrade('island', unl.cost, idx));
+    }
+    tabBuild.appendChild(card);
+  });
+}
+
+function buyUpgrade(type, cost, index = 0) {
+  if (state.money < cost) {
+    showFx('🪙 เงินไม่พอสำหรับอัปเกรด!', robotWorldPos, '#FF7A6B');
+    Sfx.error();
+    return;
+  }
+  if (type === 'plot') {
+    state.money -= cost;
+    state.unlockedPlots++;
+    refreshPlotLocks();
+    Sfx.build();
+    showFx('🌱 ขยายแปลงผักสำเร็จ!', robotWorldPos, '#35B77E');
+  } else if (type === 'house') {
+    state.money -= cost;
+    state.houseLevel++;
+    buildHouse(state.houseLevel);
+    Sfx.build();
+    showFx(`🏡 บ้านอัปเกรดเป็น Lv.${state.houseLevel}!`, HOUSE_POS, '#2E8FD8');
+  } else if (type === 'island') {
+    const unl = ISLAND_UNLOCK[index];
+    if (state.level < unl.level) {
+      showFx(`🔒 ต้องการ Lv.${unl.level}`, robotWorldPos, '#FF7A6B');
+      Sfx.error();
+      return;
+    }
+    state.money -= cost;
+    state.islands[index] = true;
+    bridges[index].group.visible = true;
+    refreshPlotLocks();
+    Sfx.build();
+    showFx(`🏝️ ปลดล็อคเกาะที่ ${index + 2} สำเร็จ!`, SIDE_ISLANDS[index].center, '#35B77E');
+  }
+  renderUI();
+}
+
+/* Tab Switching */
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    Sfx.click();
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    document.getElementById('tabSeeds').classList.toggle('hidden', tab !== 'seeds');
+    document.getElementById('tabBuild').classList.toggle('hidden', tab !== 'build');
+  });
+});
+
+/* Sell Button */
+document.getElementById('sellBtn').addEventListener('click', () => {
+  let earned = 0;
+  for (const [k, v] of Object.entries(state.inventory)) {
+    earned += (CROPS[k]?.sell || 0) * v;
+  }
+  if (earned > 0) {
+    state.money += earned;
+    state.totalEarnings += earned;
+    state.inventory = {};
+    Sfx.coin();
+    showFx(`+${earned} 🪙`, robotWorldPos, '#FFE45C', true);
+    renderUI();
+  }
+});
+
+function addExp(amount) {
+  state.exp += amount;
+  let req = expRequired(state.level);
+  while (state.exp >= req) {
+    state.exp -= req;
+    state.level++;
+    req = expRequired(state.level);
+    Sfx.levelUp();
+    showLevelUpFx(state.level);
+    refreshPlotLocks();
+  }
+}
+
+/* =====================================================================
+   14. QUIZ SYSTEM & MATHEMATICS ENGINE
+   ===================================================================== */
+function generateMathQuestion() {
+  const ops = ['+', '-', '*'];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  let a = 0, b = 0, ans = 0;
+
+  if (op === '+') {
+    a = Math.floor(Math.random() * 45) + 5;
+    b = Math.floor(Math.random() * 45) + 5;
+    ans = a + b;
+  } else if (op === '-') {
+    a = Math.floor(Math.random() * 50) + 10;
+    b = Math.floor(Math.random() * a);
+    ans = a - b;
+  } else if (op === '*') {
+    a = Math.floor(Math.random() * 11) + 2;
+    b = Math.floor(Math.random() * 11) + 2;
+    ans = a * b;
+  }
+
+  const choices = new Set([ans]);
+  while (choices.size < 4) {
+    const diff = (Math.floor(Math.random() * 7) + 1) * (Math.random() < 0.5 ? 1 : -1);
+    const c = ans + diff;
+    if (c >= 0) choices.add(c);
+  }
+  const arr = Array.from(choices).sort(() => Math.random() - 0.5);
+  return { q: `${a} ${op === '*' ? '×' : op} ${b} = ?`, ans, choices: arr };
+}
+
+let currentQuiz = null;
+function openQuiz(mode) {
+  state.quizOpen = true;
+  state.quizMode = mode;
+  currentQuiz = generateMathQuestion();
+
+  const modal = document.getElementById('modal');
+  const icon = document.getElementById('qIcon');
+  const title = document.getElementById('qTitle');
+  const sub = document.getElementById('qSub');
+
+  if (mode === 'robot') {
+    icon.textContent = '🤖';
+    title.textContent = 'ควิซหุ่นยนต์ผู้ช่วย';
+    sub.textContent = 'ตอบถูกเพื่อรับบัฟ รดน้ำเร่งโต x1.5 เป็นเวลา 10 วินาที!';
+  } else {
+    icon.textContent = '💧';
+    title.textContent = 'บ่อน้ำวิเศษ';
+    sub.textContent = 'ตอบถูกเพื่อเติมน้ำรดผัก 2 หยด (สะสมได้สูงสุด 5 หยด)';
+  }
+
+  document.getElementById('qText').textContent = currentQuiz.q;
+  document.getElementById('qResult').textContent = '';
+  document.getElementById('qClose').classList.add('hidden');
+
+  const container = document.getElementById('qChoices');
+  container.innerHTML = '';
+  currentQuiz.choices.forEach(val => {
+    const btn = document.createElement('button');
+    btn.className = 'choice';
+    btn.textContent = val;
+    btn.addEventListener('click', () => handleQuizAnswer(val, btn));
+    container.appendChild(btn);
+  });
+
+  modal.classList.remove('hidden');
+}
+
+function handleQuizAnswer(val, btnEl) {
+  const isRight = val === currentQuiz.ans;
+  document.querySelectorAll('.choice').forEach(b => {
+    b.disabled = true;
+    if (parseInt(b.textContent) === currentQuiz.ans) b.classList.add('right');
+  });
+
+  const res = document.getElementById('qResult');
+  if (isRight) {
+    if (!btnEl.classList.contains('right')) btnEl.classList.add('right');
+    Sfx.correct();
+    if (state.quizMode === 'robot') {
+      res.textContent = '🎉 ถูกต้อง! ได้รับบัฟเร่งโต 1.5x (10 วินาที)';
+      res.style.color = '#2FA463';
+      state.buffTimer = BUFF_TIME;
+    } else {
+      state.waterDrops = Math.min(MAX_DROPS, state.waterDrops + DROPS_PER_QUIZ);
+      res.textContent = `🎉 ถูกต้อง! เติมน้ำ +${DROPS_PER_QUIZ} หยด (${state.waterDrops}/${MAX_DROPS})`;
+      res.style.color = '#2E8FD8';
+      renderUI();
+    }
+  } else {
+    btnEl.classList.add('wrong');
+    Sfx.wrong();
+    if (state.quizMode === 'robot') {
+      res.textContent = '💥 ตอบผิด! หุ่นยนต์ช็อตพัง 10 วินาที';
+      res.style.color = '#E0453C';
+      state.brokenTimer = BROKEN_TIME;
+    } else {
+      res.textContent = '❌ ตอบผิด! ลองใหม่อีกครั้ง';
+      res.style.color = '#E0453C';
+    }
+  }
+
+  document.getElementById('qClose').classList.remove('hidden');
+}
+
+document.getElementById('qClose').addEventListener('click', () => {
+  Sfx.click();
+  document.getElementById('modal').classList.add('hidden');
+  state.quizOpen = false;
+});
+
+/* =====================================================================
+   15. AUTHENTICATION & LOCALSTORAGE SAVE SYSTEM
+   ===================================================================== */
+const STORAGE_PREFIX = 'minifarm_3d_user_';
+
+function getSavedUsers() {
+  try { return JSON.parse(localStorage.getItem('minifarm_users_db') || '{}'); } catch (e) { return {}; }
+}
+function saveUsersDb(db) {
+  try { localStorage.setItem('minifarm_users_db', JSON.stringify(db)); } catch (e) {}
+}
+
+function loadUserData(username) {
+  try {
+    const raw = localStorage.getItem(STORAGE_PREFIX + username);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+
+function saveUserData() {
+  if (!state.user) return;
+  const data = {
+    user: state.user, firstName: state.firstName, lastName: state.lastName,
+    money: state.money, inventory: state.inventory, selectedSeed: state.selectedSeed,
+    level: state.level, exp: state.exp, waterDrops: state.waterDrops,
+    totalEarnings: state.totalEarnings, unlockedPlots: state.unlockedPlots,
+    houseLevel: state.houseLevel, islands: state.islands,
+    plots: plots.map(p => ({ crop: p.crop, grow: p.grow, growTime: p.growTime, ready: p.ready })),
+  };
+  try { localStorage.setItem(STORAGE_PREFIX + state.user, JSON.stringify(data)); } catch (e) {}
+}
+
+/* UI Auth handlers */
+const authOverlay = document.getElementById('authOverlay');
+const loginForm = document.getElementById('loginForm');
+const registerForm = document.getElementById('registerForm');
+
+document.getElementById('toRegister').addEventListener('click', () => {
+  loginForm.classList.add('hidden'); registerForm.classList.remove('hidden');
+  document.getElementById('authTitle').textContent = 'สมัครสมาชิกใหม่';
+});
+document.getElementById('toLogin').addEventListener('click', () => {
+  registerForm.classList.add('hidden'); loginForm.classList.remove('hidden');
+  document.getElementById('authTitle').textContent = 'ลงชื่อเข้าใช้';
+});
+
+document.getElementById('btnLogin').addEventListener('click', () => {
+  const u = document.getElementById('loginUser').value.trim().toLowerCase();
+  const msg = document.getElementById('authMsg');
+  if (!u) { msg.textContent = 'กรุณากรอกชื่อผู้ใช้'; return; }
+  const db = getSavedUsers();
+  if (!db[u]) { msg.textContent = 'ไม่พบบัญชีนี้ กรุณาสมัครสมาชิกก่อน'; return; }
+
+  initUserSession(u, db[u].first, db[u].last);
+});
+
+document.getElementById('btnRegister').addEventListener('click', () => {
+  const u = document.getElementById('regUser').value.trim().toLowerCase();
+  const f = document.getElementById('regFirst').value.trim();
+  const l = document.getElementById('regLast').value.trim();
+  const msg = document.getElementById('authMsg2');
+
+  if (!u || !f || !l) { msg.textContent = 'กรุณากรอกข้อมูลให้ครบถ้วน'; return; }
+  const db = getSavedUsers();
+  if (db[u]) { msg.textContent = 'ชื่อผู้ใช้นี้ถูกใช้งานแล้ว'; return; }
+
+  db[u] = { first: f, last: l };
+  saveUsersDb(db);
+  initUserSession(u, f, l);
+});
+
+function initUserSession(username, first, last) {
+  state.user = username;
+  state.firstName = first;
+  state.lastName = last;
+
+  const saved = loadUserData(username);
+  if (saved) {
+    state.money = saved.money ?? 100;
+    state.inventory = saved.inventory ?? {};
+    state.selectedSeed = saved.selectedSeed ?? 'tomato';
+    state.level = saved.level ?? 1;
+    state.exp = saved.exp ?? 0;
+    state.waterDrops = saved.waterDrops ?? 0;
+    state.totalEarnings = saved.totalEarnings ?? 0;
+    state.unlockedPlots = saved.unlockedPlots ?? MAIN_PLOTS_START;
+    state.houseLevel = saved.houseLevel ?? 1;
+    state.islands = saved.islands ?? [false, false, false];
+
+    if (saved.plots && Array.isArray(saved.plots)) {
+      saved.plots.forEach((sp, i) => {
+        if (plots[i] && sp.crop) {
+          plots[i].crop = sp.crop;
+          plots[i].grow = sp.grow;
+          plots[i].growTime = sp.growTime;
+          plots[i].ready = sp.ready;
+          const md = createCrop(sp.crop);
+          plots[i].model = md.group;
+          plots[i].modelData = md;
+          plots[i].cropAnchor.add(md.group);
+          if (sp.ready) {
+            md.group.scale.setScalar(1.0);
+            md.fruits.forEach(f => f.scale.setScalar(1.0));
+          } else {
+            plots[i].bar.visible = true;
+            updatePlotBar(plots[i]);
+          }
+        }
+      });
+    }
+  }
+
+  buildHouse(state.houseLevel);
+  state.islands.forEach((unl, idx) => { if (unl) bridges[idx].group.visible = true; });
+  refreshPlotLocks();
+
+  document.getElementById('whoami').textContent = `เกษตรกร: ${first} ${last} (@${username})`;
+  authOverlay.classList.add('hidden');
+  renderUI();
+  Sfx.unlock();
+}
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  saveUserData();
+  Sfx.click();
+  showFx('💾 บันทึกเกมสำเร็จ!', robotWorldPos, '#2E8FD8');
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  saveUserData();
+  location.reload();
+});
+
+document.getElementById('bgmBtn').addEventListener('click', () => {
+  state.bgmOn = !state.bgmOn;
+  document.getElementById('bgmBtn').textContent = state.bgmOn ? '🎵 ปิด BGM' : '🎵 ดนตรี';
+  if (state.bgmOn) Sfx.bgmStart(); else Sfx.bgmStop();
+});
+
+/* Guide Modal */
+document.getElementById('btnGuide').addEventListener('click', () => {
+  Sfx.click();
+  document.getElementById('guideModal').classList.remove('hidden');
+});
+document.getElementById('guideClose').addEventListener('click', () => {
+  Sfx.click();
+  document.getElementById('guideModal').classList.add('hidden');
+});
+
+/* Auto-save */
+setInterval(() => { saveUserData(); }, AUTOSAVE_SEC * 1000);
+
+/* =====================================================================
+   16. FLOATING FX & LEVEL UP ANIMS
+   ===================================================================== */
+function showFx(text, worldPos, color = '#35B77E', big = false) {
+  const proj = worldPos.clone().project(camera);
+  const x = (proj.x * 0.5 + 0.5) * innerWidth;
+  const y = -(proj.y * 0.5 - 0.5) * innerHeight;
+
+  const el = document.createElement('div');
+  el.className = `ftext ${big ? 'big' : ''}`;
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+  el.style.color = color;
+  el.textContent = text;
+  document.getElementById('fx').appendChild(el);
+  setTimeout(() => el.remove(), 1400);
+}
+
+function showLevelUpFx(level) {
+  const el = document.createElement('div');
+  el.className = 'levelup';
+  el.textContent = `LEVEL UP! Lv.${level}`;
+  document.getElementById('fx').appendChild(el);
+  setTimeout(() => el.remove(), 2000);
+}
+
+/* =====================================================================
+   17. MAIN ANIMATION LOOP
+   ===================================================================== */
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const delta = Math.min(clock.getDelta(), 0.1);
+  const time = clock.getElapsedTime();
+
+  /* Ocean Wave Animation */
+  const posArr = oceanGeo.attributes.position.array;
+  for (let i = 0; i < posArr.length; i += 3) {
+    const x = oceanBase[i], z = oceanBase[i + 2];
+    posArr[i + 1] = Math.sin(time * 1.3 + x * 0.18 + z * 0.14) * 0.28 + Math.cos(time * 0.9 + z * 0.22) * 0.18;
+  }
+  oceanGeo.attributes.position.needsUpdate = true;
+
+  /* Swaying Trees */
+  for (const tree of swayTrees) {
+    const crown = tree.userData.crown;
+    const p = tree.userData.phase + time * 1.8;
+    crown.rotation.z = Math.sin(p) * tree.userData.amp;
+    crown.rotation.x = Math.cos(p * 0.8) * (tree.userData.amp * 0.7);
+  }
+
+  /* Water Well Bucket Dip */
+  well.userData.water.position.y = 0.8 + Math.sin(time * 2.2) * 0.03;
+  well.userData.bucket.position.y = 1.38 + Math.sin(time * 1.5) * 0.08;
+
+  /* Chimney Smoke Emission */
+  if (state.houseLevel >= 1) {
+    smokeTimer += delta;
+    if (smokeTimer >= 0.45) { emitSmoke(); smokeTimer = 0; }
+    for (const s of smokePool) {
+      if (s.life > 0) {
+        s.life -= delta;
+        const progress = 1 - s.life / s.max;
+        s.mesh.position.y += delta * 0.82;
+        s.mesh.position.x += s.vx * delta;
+        s.mesh.position.z += s.vz * delta;
+        s.mesh.scale.setScalar(0.42 + progress * 0.85);
+        s.mesh.material.opacity = (1 - progress) * 0.42;
+        if (s.life <= 0) s.mesh.visible = false;
+      }
+    }
+  }
+
+  /* Robot Timers & Movement */
+  if (state.buffTimer > 0) state.buffTimer = Math.max(0, state.buffTimer - delta);
+  if (state.brokenTimer > 0) state.brokenTimer = Math.max(0, state.brokenTimer - delta);
+
+  let moveX = 0, moveZ = 0;
+  if (keys.w) moveZ -= 1;
+  if (keys.s) moveZ += 1;
+  if (keys.a) moveX -= 1;
+  if (keys.d) moveX += 1;
+  if (joy.active) { moveX = joy.dx; moveZ = joy.dy; }
+
+  const moveLen = Math.hypot(moveX, moveZ);
+  if (moveLen > 0.1) {
+    const nx = moveX / Math.max(1, moveLen);
+    const nz = moveZ / Math.max(1, moveLen);
+    const speed = 4.2;
+    robotWorldPos.x += nx * speed * delta;
+    robotWorldPos.z += nz * speed * delta;
+
+    /* Island Bounds Constraint */
+    const distFromCenter = Math.hypot(robotWorldPos.x, robotWorldPos.z);
+    if (distFromCenter > ISLAND_R - 0.7) {
+      let onBridge = false;
+      for (const br of bridges) {
+        if (!br.group.visible) continue;
+        const toRobot = robotWorldPos.clone().sub(br.from);
+        const brDir = br.to.clone().sub(br.from).normalize();
+        const proj = toRobot.dot(brDir);
+        if (proj >= -0.5 && proj <= br.len + 0.5) {
+          const perp = toRobot.clone().sub(brDir.clone().multiplyScalar(proj));
+          if (perp.length() < 1.1) { onBridge = true; break; }
+        }
+      }
+      let onSideIsland = false;
+      if (!onBridge) {
+        for (let k = 0; k < SIDE_ISLANDS.length; k++) {
+          if (!state.islands[k]) continue;
+          if (robotWorldPos.distanceTo(SIDE_ISLANDS[k].center) <= SIDE_R - 0.7) { onSideIsland = true; break; }
+        }
+      }
+      if (!onBridge && !onSideIsland) {
+        robotWorldPos.x = (robotWorldPos.x / distFromCenter) * (ISLAND_R - 0.7);
+        robotWorldPos.z = (robotWorldPos.z / distFromCenter) * (ISLAND_R - 0.7);
+      }
+    }
+
+    robotGroup.position.copy(robotWorldPos);
+    const targetAngle = Math.atan2(nx, nz);
+    robotGroup.rotation.y = THREE.MathUtils.lerp(robotGroup.rotation.y, targetAngle, 0.2);
+
+    /* Walking Animations */
+    robotParts.wheel.rotation.x += speed * delta * 2.5;
+    robotParts.base.position.y = Math.abs(Math.sin(time * 12)) * 0.1;
+    robotParts.armL.rotation.x = Math.sin(time * 12) * 0.6;
+    robotParts.armR.rotation.x = -Math.sin(time * 12) * 0.6;
+  } else {
+    robotParts.base.position.y = Math.sin(time * 3) * 0.04;
+    robotParts.armL.rotation.x = THREE.MathUtils.lerp(robotParts.armL.rotation.x, 0, 0.1);
+    robotParts.armR.rotation.x = THREE.MathUtils.lerp(robotParts.armR.rotation.x, 0, 0.1);
+    robotParts.headGroup.rotation.y = Math.sin(time * 1.5) * 0.15;
+  }
+
+  /* Robot UI Floating Label Position */
+  const robotHeadWorld = robotWorldPos.clone().add(new THREE.Vector3(0, 2.2, 0));
+  const robotProj = robotHeadWorld.project(camera);
+  const rx = (robotProj.x * 0.5 + 0.5) * innerWidth;
+  const ry = -(robotProj.y * 0.5 - 0.5) * innerHeight;
+  const rLbl = document.getElementById('robotLabel');
+  rLbl.style.left = `${rx}px`;
+  rLbl.style.top = `${ry}px`;
+
+  if (state.brokenTimer > 0) {
+    rLbl.textContent = `💥 ซ่อมแซม... (${Math.ceil(state.brokenTimer)}s)`;
+    rLbl.className = 'broken';
+    robotParts.antTip.material.color.setHex(0xFF3333);
+  } else if (state.buffTimer > 0) {
+    rLbl.textContent = `⚡ BUFF 1.5x (${Math.ceil(state.buffTimer)}s)`;
+    rLbl.className = 'water';
+    robotParts.antTip.material.color.setHex(0x2EE6FF);
+  } else {
+    rLbl.textContent = 'QUIZ 🤖';
+    rLbl.className = '';
+    robotParts.antTip.material.color.setHex(0x4FB6E8);
+  }
+
+  /* Crop Growth Progress */
+  const speedMult = state.buffTimer > 0 ? BUFF_MULT : 1.0;
+  for (const P of plots) {
+    if (P.unlocked && P.crop && !P.ready) {
+      P.grow += delta * speedMult;
+      updatePlotBar(P);
+
+      const pct = Math.min(1, P.grow / P.growTime);
+      if (P.model) {
+        P.model.scale.setScalar(0.25 + pct * 0.75);
+        P.modelData.fruits.forEach(f => f.scale.setScalar(pct));
+      }
+
+      if (P.grow >= P.growTime) {
+        P.ready = true;
+        P.bar.visible = false;
+        P.readyT = time;
+        if (P.model) P.model.scale.setScalar(1.0);
+        P.modelData.fruits.forEach(f => f.scale.setScalar(1.0));
+        showFx('✨ โตแล้ว!', P.world, '#FFE45C');
+      }
+    }
+
+    if (P.ready && P.model) {
+      /* Gentle Bouncing Animation when ready to harvest */
+      P.model.position.y = Math.sin((time - P.readyT) * 4) * 0.08;
+    }
+  }
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+/* =====================================================================
+   18. INITIALIZATION & RESIZE
+   ===================================================================== */
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+/* Robot Label Click Trigger */
+document.getElementById('robotLabel').addEventListener('click', () => {
+  if (state.brokenTimer > 0) {
+    showFx('🤖 หุ่นยนต์กำลังซ่อมแซม...', robotWorldPos, '#FF7A6B');
+    Sfx.error();
+  } else {
+    openQuiz('robot');
+  }
+});
+
+/* Hide Loader Screen when Ready */
+setTimeout(() => {
+  const loader = document.getElementById('loader');
+  loader.classList.add('gone');
+  setTimeout(() => loader.remove(), 600);
+}, 600);
+
+animate();
 </script>
 </body>
 </html>
