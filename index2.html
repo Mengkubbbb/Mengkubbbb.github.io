@@ -1,0 +1,859 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Final Exam Lab — ห้องซ้อมสอบปลายภาค 📚</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --bg-main: #f0f4f8;
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --bg-glass: rgba(255, 255, 255, 0.65);
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --brand-blue: #0284c7;
+    --brand-blue-hover: #0369a1;
+    --brand-teal: #0d9488;
+    --brand-green: #16a34a;
+    --brand-red: #e11d48;
+    --brand-purple: #7c3aed;
+    --line: rgba(226, 232, 240, 0.8);
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 20px 30px -10px rgba(0, 0, 0, 0.12);
+  }
+
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    background: #e0f2fe;
+    color: var(--text-primary);
+    font-family: 'Kanit', system-ui, -apple-system, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+    overflow-x: hidden;
+  }
+
+  canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+  /* ============ LAYOUT ============ */
+  #ui {
+    position: relative; z-index: 10;
+    max-width: 1100px; margin: 0 auto;
+    padding: clamp(12px, 2.5vw, 24px);
+    display: flex; flex-direction: column; gap: 16px;
+    min-height: 100vh;
+  }
+  .hidden { display: none !important; }
+
+  /* ============ GLASS PANEL ============ */
+  .panel {
+    background: var(--bg-card);
+    -webkit-backdrop-filter: blur(16px) saturate(1.8);
+    backdrop-filter: blur(16px) saturate(1.8);
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
+    border-radius: 24px;
+    box-shadow: var(--shadow-md);
+    color: var(--text-primary);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  /* ============ HEADER & HERO ============ */
+  .hero-header {
+    padding: 20px 24px;
+    display: flex; flex-direction: column; gap: 8px;
+    position: relative; overflow: hidden;
+  }
+  .hero-header::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at 80% 20%, rgba(186, 230, 253, 0.4) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 999px;
+    background: #e0f2fe; color: var(--brand-blue);
+    font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
+    width: fit-content; border: 1px solid #bae6fd;
+  }
+  .hero-header h1 {
+    margin: 0; font-size: clamp(24px, 4vw, 36px); font-weight: 700; color: #0f172a;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hero-header p { margin: 0; color: var(--text-secondary); font-size: 14px; font-weight: 300; }
+
+  /* ============ STATS HUD ============ */
+  .hud-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;
+  }
+  .stat-card {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.7); border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+  }
+  .stat-card .ico {
+    width: 42px; height: 42px; border-radius: 14px;
+    display: grid; place-items: center; font-size: 20px;
+    background: linear-gradient(135deg, #bae6fd, #0284c7); color: #fff;
+    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25); flex-shrink: 0;
+  }
+  .stat-card.green .ico {
+    background: linear-gradient(135deg, #bbf7d0, #16a34a);
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+  }
+  .stat-card.purple .ico {
+    background: linear-gradient(135deg, #ddd6fe, #7c3aed);
+    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.25);
+  }
+  .stat-lbl { font-size: 11px; color: var(--text-secondary); font-weight: 400; }
+  .stat-val { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+
+  /* ============ NAVIGATION TABS ============ */
+  .nav-tabs {
+    display: flex; gap: 10px; padding: 6px;
+    background: rgba(255, 255, 255, 0.75);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border-radius: 18px; border: 1.5px solid rgba(255, 255, 255, 0.9);
+    position: sticky; top: 12px; z-index: 20; box-shadow: var(--shadow-sm);
+  }
+  .tab-btn {
+    flex: 1; border: none; background: transparent; padding: 10px 16px;
+    border-radius: 13px; font-size: 14px; font-weight: 500; color: var(--text-secondary);
+    cursor: pointer; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: inherit;
+  }
+  .tab-btn:hover { color: var(--brand-blue); background: rgba(224, 242, 254, 0.5); }
+  .tab-btn.active {
+    background: #ffffff; color: var(--brand-blue); font-weight: 600;
+    box-shadow: var(--shadow-sm); transform: scale(1.02);
+  }
+
+  /* ============ SUBJECT & TOPIC GRIDS ============ */
+  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .subject-card {
+    padding: 22px; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.9);
+    background: rgba(255, 255, 255, 0.8);
+    cursor: pointer; text-align: left; transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-sm);
+  }
+  .subject-card:hover {
+    transform: translateY(-4px); background: #ffffff;
+    box-shadow: var(--shadow-lg); border-color: #bae6fd;
+  }
+  .subject-icon {
+    width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center;
+    font-size: 28px; background: #f0f9ff; border: 1px solid #e0f2fe; flex-shrink: 0;
+  }
+  .subject-info b { font-size: 18px; color: var(--text-primary); display: block; margin-bottom: 2px; }
+  .subject-info small { font-size: 12px; color: var(--text-secondary); font-weight: 300; }
+
+  .topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 14px; }
+  .topic-card {
+    padding: 14px 16px; border-radius: 16px; border: 1.5px solid rgba(255,255,255,0.8);
+    background: rgba(255, 255, 255, 0.7); cursor: pointer; text-align: left;
+    transition: all 0.2s ease; display: flex; flex-direction: column; gap: 4px;
+    font-family: inherit;
+  }
+  .topic-card:hover {
+    transform: translateY(-2px); background: #ffffff; border-color: #0284c7;
+    box-shadow: var(--shadow-md);
+  }
+  .topic-card b { font-size: 15px; color: var(--text-primary); }
+  .topic-card small { font-size: 12px; color: var(--text-secondary); }
+
+  /* ============ CONTENT & FORMULAS ============ */
+  .view-container { padding: 24px; }
+  .btn-back {
+    border: none; background: #e0f2fe; color: var(--brand-blue);
+    padding: 8px 16px; border-radius: 12px; font-weight: 600; font-size: 13px;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    margin-bottom: 16px; transition: all 0.2s; font-family: inherit;
+  }
+  .btn-back:hover { background: #bae6fd; transform: translateX(-2px); }
+
+  .formula-box {
+    font-size: 18px; font-weight: 600; color: #0284c7;
+    background: #f0f9ff; border: 1.5px dashed #7dd3fc; border-radius: 16px;
+    padding: 16px; text-align: center; margin: 14px 0;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  }
+  .diagram-box {
+    display: flex; justify-content: center; align-items: center; min-height: 120px;
+    background: #f8fafc; border: 1px solid var(--line); border-radius: 16px;
+    margin: 14px 0; font-size: 48px; gap: 12px;
+  }
+  .step-box {
+    border-left: 4px solid var(--brand-blue); padding: 12px 16px; margin: 10px 0;
+    background: #f0f9ff; border-radius: 0 12px 12px 0; font-size: 14px;
+  }
+  .example-box {
+    background: #f8fafc; border: 1px solid var(--line); padding: 14px;
+    border-radius: 14px; margin: 12px 0; font-size: 14px;
+  }
+  .answer-text { color: var(--brand-green); font-weight: 700; }
+
+  .mini-quiz-grid { display: grid; gap: 8px; margin-top: 12px; }
+  .mini-btn {
+    padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--line);
+    background: #ffffff; color: var(--text-primary); text-align: left; cursor: pointer;
+    font-size: 13.5px; transition: all 0.2s; font-family: inherit; font-weight: 400;
+  }
+  .mini-btn:hover { border-color: var(--brand-blue); background: #f0f9ff; }
+
+  /* ============ QUIZ SYSTEM ============ */
+  .quiz-card {
+    background: #ffffff; border-radius: 18px; border: 1.5px solid var(--line);
+    padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-sm);
+    transition: transform 0.2s;
+  }
+  .quiz-card p { font-size: 16.5px; font-weight: 600; margin: 8px 0 14px; color: var(--text-primary); }
+  .opt-btn {
+    display: block; width: 100%; text-align: left; margin: 8px 0; padding: 12px 16px;
+    border-radius: 12px; border: 1.5px solid var(--line); background: #f8fafc;
+    color: var(--text-primary); font-size: 14.5px; cursor: pointer;
+    transition: all 0.15s ease; font-family: inherit;
+  }
+  .opt-btn:hover:not(:disabled) { border-color: var(--brand-blue); background: #f0f9ff; transform: translateX(2px); }
+  .opt-btn.correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #15803d !important; font-weight: 600; }
+  .opt-btn.wrong { background: #ffe4e6 !important; border-color: #f43f5e !important; color: #be123c !important; }
+  .explain-text { font-size: 13px; color: var(--text-secondary); margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line); }
+
+  .btn-primary {
+    font-family: inherit; border: none; cursor: pointer; width: 100%;
+    padding: 14px; border-radius: 14px; font-size: 16px; font-weight: 600;
+    color: #fff; background: linear-gradient(135deg, #0284c7, #0369a1);
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); transition: all 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.05); }
+  .btn-primary:active { transform: translateY(0); }
+
+  /* ============ FLOATING FX & ANIMATIONS ============ */
+  #fx-layer { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
+  .floating-spark {
+    position: absolute; font-weight: 700; font-size: 20px;
+    animation: floatUp 1.2s cubic-bezier(0.18, 0.7, 0.32, 1) forwards;
+  }
+  @keyframes floatUp {
+    0% { opacity: 0; transform: translate(-50%, 0) scale(0.5); }
+    20% { opacity: 1; transform: translate(-50%, -20px) scale(1.2); }
+    100% { opacity: 0; transform: translate(-50%, -80px) scale(0.9); }
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 600px) {
+    #ui { padding: 10px; }
+    .hero-header { padding: 16px; }
+    .view-container { padding: 16px; }
+    .stat-card { padding: 10px; }
+    .stat-card .ico { width: 36px; height: 36px; font-size: 18px; }
+    .stat-val { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Interactive Background Canvas -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- Floating FX Container -->
+<div id="fx-layer"></div>
+
+<div id="ui">
+  <!-- Hero Header -->
+  <header class="panel hero-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span class="pill">⚡ FINAL EXAM LAB</span>
+      <span id="game-level" class="pill" style="background:#fef3c7; color:#d97706; border-color:#fde68a;">⭐ Lv.1 Novice</span>
+    </div>
+    <h1>ห้องซ้อมสอบปลายภาค 📚</h1>
+    <p>คณิตศาสตร์ · วิทยาศาสตร์ · สุขศึกษา · สังคมศึกษา | สรุปสูตร + แบบฝึกหัดโต้ตอบ</p>
+  </header>
+
+  <!-- HUD Dashboard -->
+  <div class="hud-row">
+    <div class="stat-card panel">
+      <div class="ico">🎯</div>
+      <div>
+        <div class="stat-lbl">คะแนนสะสม (EXP)</div>
+        <div class="stat-val" id="exp-val">0 PTS</div>
+      </div>
+    </div>
+    <div class="stat-card panel green">
+      <div class="ico">✅</div>
+      <div>
+        <div class="stat-lbl">ทำถูกต้องแล้ว</div>
+        <div class="stat-val" id="correct-val">0 ข้อ</div>
+      </div>
+    </div>
+    <div class="stat-card panel purple">
+      <div class="ico">🔥</div>
+      <div>
+        <div class="stat-lbl">Streak ต่อเนื่อง</div>
+        <div class="stat-val" id="streak-val">0x</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('home', this)">🏠 หน้าหลัก</button>
+    <button class="tab-btn" onclick="switchTab('quiz', this)">📝 ตะลุยโจทย์สอบ</button>
+  </nav>
+
+  <!-- MAIN HOME VIEW -->
+  <main id="home-view" class="panel view-container">
+    <h2 style="margin-top:0; font-size: 20px; color: var(--text-primary);">เลือกรายวิชาเพื่อเริ่มติว 🎯</h2>
+    <p style="color: var(--text-secondary); font-size: 13.5px; margin-bottom: 20px;">คลิกเลือกรายวิชาเพื่อดูเนื้อหาสรุป สูตรคำนวณ และแบบฝึกหัดย่อย</p>
+    
+    <div class="grid-2">
+      <div class="subject-card" onclick="openSubject('math')">
+        <div class="subject-icon">➗</div>
+        <div class="subject-info">
+          <b>คณิตศาสตร์</b>
+          <small>3 บทหลัก · สูตรคำนวณ · ตัวอย่างโจทย์</small>
+        </div>
+      </div>
+      <div class="subject-card" onclick="openSubject('science')">
+        <div class="subject-icon">🧬</div>
+        <div class="subject-info">
+          <b>วิทยาศาสตร์</b>
+          <small>ร่างกาย · แรง · ไฟฟ้า · โมเมนต์</small>
+        </div>
+      </div>
+      <div class="subject-card" onclick="openSubject('health')">
+        <div class="subject-icon">🩺</div>
+        <div class="subject-info">
+          <b>สุขศึกษา</b>
+          <small>เพศศึกษา · บริการสุขภาพ · บาสเกตบอล</small>
+        </div>
+      </div>
+      <div class="subject-card" onclick="openSubject('social')">
+        <div class="subject-icon">🌍</div>
+        <div class="subject-info">
+          <b>สังคมศึกษา</b>
+          <small>เครื่องมือทางภูมิศาสตร์ · ยุโรป · แอฟริกา</small>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SUBJECT SECTIONS -->
+  <section id="math-view" class="panel view-container hidden">
+    <button class="btn-back" onclick="switchTab('home')">← กลับหน้าหลัก</button>
+    <h2 style="margin-top:0;">➗ วิชาคณิตศาสตร์</h2>
+    <p style="color: var(--text-secondary); font-size: 14px;">เลือกหัวข้อย่อยเพื่อเข้าสู่บทเรียน</p>
+    <div class="topic-grid">
+      <div class="topic-card" onclick="openTopic('math-transform')">
+        <b>🔄 การแปลงทางเรขาคณิต</b>
+        <small>เลื่อนขนาน · สะท้อน · หมุน</small>
+      </div>
+      <div class="topic-card" onclick="openTopic('math-power')">
+        <b>² เลขยกกำลัง</b>
+        <small>กฎและสมบัติการคำนวณ</small>
+      </div>
+      <div class="topic-card" onclick="openTopic('math-poly')">
+        <b>𝑥² พหุนาม</b>
+        <small>การบวก ลบ คูณ และแจกแจง</small>
+      </div>
+    </div>
+  </section>
+
+  <section id="science-view" class="panel view-container hidden">
+    <button class="btn-back" onclick="switchTab('home')">← กลับหน้าหลัก</button>
+    <h2 style="margin-top:0;">🧬 วิชาวิทยาศาสตร์</h2>
+    <p style="color: var(--text-secondary); font-size: 14px;">เลือกหัวข้อย่อยเพื่อเข้าสู่บทเรียน</p>
+    <div class="topic-grid">
+      <div class="topic-card" onclick="openTopic('sci-kidney')">
+        <b>🫘 ระบบขับถ่าย</b>
+        <small>ไต · ปัสสาวะ · โครงสร้างหน่วยไต</small>
+      </div>
+      <div class="topic-card" onclick="openTopic('sci-brain')">
+        <b>🧠 ระบบประสาท</b>
+        <small>สมอง · เซลล์ประสาท · รีเฟลกซ์</small>
+      </div>
+      <div class="topic-card" onclick="openTopic('sci-repro')">
+        <b>🧬 ระบบสืบพันธุ์</b>
+        <small>เซลล์สืบพันธุ์ · ฮอร์โมน · ประจำเดือน</small>
+      </div>
+      <div class="topic-card" onclick="openTopic('sci-force')">
+        <b>⚙️ แรงและการเคลื่อนที่</b>
+        <small>แรงลัพธ์ · แรงเสียดทาน · เวกเตอร์</small>
+      </div>
+      <div class="topic-card" onclick="openTopic('sci-fluid')">
+        <b>💧 ของเหลวและแรงพยุง</b>
+        <small>ความดันของเหลว · แรงพยุง</small>
+      </div>
+      <div class="topic-card" onclick="openTopic('sci-moment')">
+        <b>⚖️ โมเมนต์ของแรง</b>
+        <small>สูตร M = Fd · การสมดุล</small>
+      </div>
+      <div class="topic-card" onclick="openTopic('sci-electric')">
+        <b>⚡ แม่เหล็กและไฟฟ้า</b>
+        <small>ประจุไฟฟ้า · สนามไฟฟ้า · แท่งแม่เหล็ก</small>
+      </div>
+    </div>
+  </section>
+
+  <section id="health-view" class="panel view-container hidden">
+    <button class="btn-back" onclick="switchTab('home')">← กลับหน้าหลัก</button>
+    <h2 style="margin-top:0;">🩺 วิชาสุขศึกษา</h2>
+    <p style="color: var(--text-secondary); font-size: 14px;">เลือกหัวข้อย่อยเพื่อเข้าสู่บทเรียน</p>
+    <div class="topic-grid">
+      <div class="topic-card" onclick="openTopic('health-sex')">
+        <b>❤️ เพศสัมพันธ์ในวัยเรียน</b>
+        <small>การยินยอม · ความปลอดภัย · การป้องกัน</small>
+      </div>
+      <div class="topic-card" onclick="openTopic('health-service')">
+        <b>🏥 บริการทางสุขภาพ</b>
+        <small>สิทธิประโยชน์ · แหล่งบริการ · การส่งต่อ</small>
+      </div>
+      <div class="topic-card" onclick="openTopic('health-tech')">
+        <b>📱 สุขภาพกับเทคโนโลยี</b>
+        <small>Screen Time · การนอน · พฤติกรรมสุขภาพ</small>
+      </div>
+      <div class="topic-card" onclick="openTopic('health-basket')">
+        <b>🏀 ประวัติบาสเกตบอล</b>
+        <small>ผู้คิดค้น · กติกาสำคัญ · พัฒนาการ</small>
+      </div>
+    </div>
+  </section>
+
+  <section id="social-view" class="panel view-container hidden">
+    <button class="btn-back" onclick="switchTab('home')">← กลับหน้าหลัก</button>
+    <h2 style="margin-top:0;">🌍 วิชาสังคมศึกษา</h2>
+    <p style="color: var(--text-secondary); font-size: 14px;">เลือกหัวข้อย่อยเพื่อเข้าสู่บทเรียน</p>
+    <div class="topic-grid">
+      <div class="topic-card" onclick="openTopic('social-map')">
+        <b>🧭 เครื่องมือทางภูมิศาสตร์</b>
+        <small>ทิศ · มาตราส่วน · การคำนวณจริง</small>
+      </div>
+      <div class="topic-card" onclick="openTopic('social-europe')">
+        <b>🇪🇺 ทวีปยุโรป</b>
+        <small>ลักษณะภูมิประเทศ · ภูมิอากาศ · เศรษฐกิจ</small>
+      </div>
+      <div class="topic-card" onclick="openTopic('social-africa')">
+        <b>🌍 ทวีปแอฟริกา</b>
+        <small>แม่น้ำไนล์ · ซาฮารา · ทรัพยากรธรรมชาติ</small>
+      </div>
+      <div class="topic-card" onclick="openTopic('social-disaster')">
+        <b>🌪️ สิ่งแวดล้อมและภัยพิบัติ</b>
+        <small>สาเหตุ · ผลกระทบ · การเตรียมรับมือ</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOPIC DETAIL VIEW -->
+  <section id="topic-detail-view" class="panel view-container hidden">
+    <button class="btn-back" onclick="backToSubject()">← กลับไปหน้ารวมวิชา</button>
+    <div id="topic-content-body"></div>
+  </section>
+
+  <!-- QUIZ VIEW -->
+  <section id="quiz-view" class="panel view-container hidden">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div>
+        <h2 style="margin:0;">📝 แบบทดสอบรวมทุกวิชา</h2>
+        <p style="margin:4px 0 0; color:var(--text-secondary); font-size:13.5px;">ตอบคำถามเพื่อรับ EXP และไต่ระดับเลเวล!</p>
+      </div>
+    </div>
+    <div id="quiz-container"></div>
+    <div id="quiz-score-board" style="text-align:center; padding:10px; font-size:20px; font-weight:700;"></div>
+    <button class="btn-primary" onclick="generateQuizSet()">🎲 สุ่มชุดข้อสอบใหม่</button>
+  </section>
+</div>
+
+<script>
+/* =====================================================================
+   BACKGROUND CANVAS ANIMATION (Clean Floating Bubbles)
+   ===================================================================== */
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let bubbles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+class Bubble {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = canvas.height + Math.random() * 100;
+    this.radius = Math.random() * 15 + 5;
+    this.speed = Math.random() * 1 + 0.5;
+    this.alpha = Math.random() * 0.3 + 0.1;
+  }
+  update() {
+    this.y -= this.speed;
+    if (this.y < -this.radius) this.reset();
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < 25; i++) bubbles.push(new Bubble());
+
+function animateBG() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  bubbles.forEach(b => {
+    b.update();
+    b.draw();
+  });
+  requestAnimationFrame(animateBG);
+}
+animateBG();
+
+/* =====================================================================
+   GAME ENGINE STATE & DATA
+   ===================================================================== */
+let gameState = {
+  exp: 0,
+  correct: 0,
+  streak: 0,
+  currentSubject: 'home'
+};
+
+const topicData = {
+  "math-transform": {
+    subject: "math", title: "🔄 การแปลงทางเรขาคณิต",
+    html: `
+      <h2>การแปลงทางเรขาคณิต</h2>
+      <p>ประกอบด้วย <b>การเลื่อนขนาน · การสะท้อน · การหมุน</b> โดยเน้นการพิจารณาพิกัดบนระนาบมุมฉาก</p>
+      <h3>1) การเลื่อนขนาน (Translation)</h3>
+      <div class="formula-box">(x, y) → (x + a, y + b)</div>
+      <div class="step-box">ตัวอย่าง: จุด (2, 3) เลื่อนไปทางขวา 4 หน่วย และขึ้นบน 2 หน่วย → (2+4, 3+2) = <b>(6, 5)</b></div>
+      <h3>2) การสะท้อน (Reflection)</h3>
+      <div class="formula-box">สะท้อนแกน X: (x, y) → (x, −y)<br>สะท้อนแกน Y: (x, y) → (−x, y)</div>
+      <div class="step-box">เทคนิคจำ: สะท้อนข้ามแกนไหน ค่าพิกัดของแกนนั้นจะคงเดิม แต่ค่าอีกแกนจะเปลี่ยนเครื่องหมาย</div>
+      <h3>3) การหมุนรอบจุดกำเนิด (Rotation)</h3>
+      <div class="formula-box">หมุนทวนเข็ม 90°: (x, y) → (−y, x)<br>หมุน 180°: (x, y) → (−x, −y)<br>หมุนทวนเข็ม 270°: (x, y) → (y, −x)</div>
+      <h3>ทดสอบความเข้าใจ</h3>
+      <div class="mini-quiz-grid">
+        <button class="mini-btn" onclick="checkMini(this, true)">จุด (3, −2) สะท้อนข้ามแกน X จะได้พิกัด (3, 2)</button>
+        <button class="mini-btn" onclick="checkMini(this, false)">จุด (1, 2) หมุนรอบจุดกำเนิด 180° จะได้พิกัด (1, −2)</button>
+      </div>
+    `
+  },
+  "math-power": {
+    subject: "math", title: "² เลขยกกำลัง",
+    html: `
+      <h2>สมบัติของเลขยกกำลัง</h2>
+      <div class="formula-box">aᵐ × aⁿ = aᵐ⁺ⁿ<br>aᵐ ÷ aⁿ = aᵐ⁻ⁿ<br>(aᵐ)ⁿ = aᵐⁿ<br>a⁰ = 1 (เมื่อ a ≠ 0)</div>
+      <div class="step-box"><b>หลักการคิด:</b><br>• ฐานเดียวกันคูณกัน → นำเลขชี้กำลังมาบวกกัน<br>• ฐานเดียวกันหารกัน → นำเลขชี้กำลังมาลบกัน<br>• กำลังซ้อนกัน → นำเลขชี้กำลังมาคูณกัน</div>
+      <div class="example-box">ตัวอย่าง 1: 2³ × 2⁴ = 2³⁺⁴ = 2⁷ = <span class="answer-text">128</span></div>
+      <div class="example-box">ตัวอย่าง 2: 3⁵ ÷ 3² = 3⁵⁻² = 3³ = <span class="answer-text">27</span></div>
+      <h3>ทดสอบความเข้าใจ</h3>
+      <div class="mini-quiz-grid">
+        <button class="mini-btn" onclick="checkMini(this, true)">2² × 2³ มีค่าเท่ากับ 2⁵ (32)</button>
+        <button class="mini-btn" onclick="checkMini(this, false)">5⁴ ÷ 5² มีค่าเท่ากับ 5⁶</button>
+      </div>
+    `
+  },
+  "math-poly": {
+    subject: "math", title: "𝑥² พหุนาม",
+    html: `
+      <h2>การดำเนินการของพหุนาม</h2>
+      <p>การบวกและลบพหุนาม ทำได้โดยการรวม <b>พจน์ที่คล้ายกัน</b> (พจน์ที่มีตัวแปรชุดเดียวกันและมีเลขชี้กำลังเท่ากัน)</p>
+      <div class="formula-box">การแจกแจง: a(b + c) = ab + ac</div>
+      <div class="example-box">ตัวอย่าง 1: 3x + 5x − 2 = <span class="answer-text">8x − 2</span></div>
+      <div class="example-box">ตัวอย่าง 2: 2(x + 3) = <span class="answer-text">2x + 6</span></div>
+      <h3>ทดสอบความเข้าใจ</h3>
+      <div class="mini-quiz-grid">
+        <button class="mini-btn" onclick="checkMini(this, true)">4x + 2x − 3 จัดรูปอย่างง่ายได้ 6x − 3</button>
+        <button class="mini-btn" onclick="checkMini(this, false)">3x + 2y รวมพจน์กันได้เป็น 5xy</button>
+      </div>
+    `
+  },
+  "sci-kidney": {
+    subject: "science", title: "🫘 ระบบขับถ่าย",
+    html: `
+      <h2>ระบบขับถ่ายและโครงสร้างไต</h2>
+      <div class="diagram-box">🩸 เลือด → 🫘 ไต → 🧪 กรองของเสีย → 💧 ปัสสาวะ</div>
+      <p>ไตทำหน้าที่กรองของเสียออกจากเลือด และรักษาการสมดุลของน้ำและเกลือแร่ในร่างกาย</p>
+      <h3>หน่วยไต (Nephron)</h3>
+      <div class="step-box">ทำหน้าที่เป็นหน่วยกรองพื้นฐาน ประกอบด้วย โกลเมอรูลัส (Glomerulus), โบว์แมนส์แคปซูล (Bowman's capsule) และท่อหน่วยไต</div>
+    `
+  },
+  "sci-brain": {
+    subject: "science", title: "🧠 ระบบประสาท",
+    html: `
+      <h2>ระบบประสาทและการตอบสนอง</h2>
+      <div class="diagram-box">🧠 สมอง ↔ ⚡ ไขสันหลัง ↔ 🖐️ หน่วยปฏิบัติงาน</div>
+      <h3>โครงสร้างเซลล์ประสาท</h3>
+      <p>• <b>เดนไดรต์ (Dendrite):</b> นำกระแสประสาทเข้าสู่ตัวเซลล์<br>• <b>แอกซอน (Axon):</b> นำกระแสประสาทออกจากตัวเซลล์</p>
+      <h3>การทำงานของสมอง</h3>
+      <p>• <b>ซีรีบรัม (Cerebrum):</b> ควบคุมความคิด ความจำ ปัญญา การเคลื่อนไหวใต้บังคับจิตใจ<br>• <b>ซีรีเบลลัม (Cerebellum):</b> ควบคุมการทรงตัวและการประสานงานของกล้ามเนื้อ</p>
+    `
+  },
+  "sci-repro": {
+    subject: "science", title: "🧬 ระบบสืบพันธุ์",
+    html: `
+      <h2>เซลล์สืบพันธุ์และฮอร์โมน</h2>
+      <p><b>เซลล์สืบพันธุ์เพศชาย:</b> อสุจิ (Sperm) | <b>เซลล์สืบพันธุ์เพศหญิง:</b> เซลล์ไข่ (Oocyte)</p>
+      <div class="diagram-box">📈 ฮอร์โมน ➔ 🥚 การตกไข่ ➔ 🩸 ประจำเดือน</div>
+      <div class="step-box">การปฏิสนธิเกิดขึ้นบริเวณ <b>ปีกมดลูก (ท่อนำไข่)</b> และตัวอ่อนจะเดินทางมาฝังตัวที่ผนังมดลูก</div>
+    `
+  },
+  "sci-force": {
+    subject: "science", title: "⚙️ แรงและการเคลื่อนที่",
+    html: `
+      <h2>ปริมาณทางฟิสิกส์และแรง</h2>
+      <div class="formula-box">อัตราเร็ว (v) = ระยะทาง (s) ÷ เวลา (t)<br>ความเร็ว (v⃗) = การกระจัด (s⃗) ÷ เวลา (t)</div>
+      <p>• <b>สเกลาร์:</b> มีเฉพาะขนาด เช่น ระยะทาง, อัตราเร็ว, มวล<br>• <b>เวกเตอร์:</b> มีทั้งขนาดและทิศทาง เช่น การกระจัด, ความเร็ว, แรง</p>
+      <div class="formula-box">แรงเสียดทาน: f = μN</div>
+    `
+  },
+  "sci-fluid": {
+    subject: "science", title: "💧 ของเหลวและแรงพยุง",
+    html: `
+      <h2>ความดันและแรงพยุงของของเหลว</h2>
+      <div class="formula-box">แรงพยุง (Fᵦ) = ρgV<br>ความดันของเหลว (P) = ρgh</div>
+      <div class="step-box"><b>หลักของอาร์คิมีดีส:</b> แรงพยุงที่กระทำต่อวัตถุมีขนาดเท่ากับน้ำหนักของของเหลวที่ถูกวัตถุนั้นแทนที่</div>
+    `
+  },
+  "sci-moment": {
+    subject: "science", title: "⚖️ โมเมนต์ของแรง",
+    html: `
+      <h2>โมเมนต์และการสมดุล</h2>
+      <div class="formula-box">M = F × d</div>
+      <p>M = โมเมนต์ (N·m), F = แรง (N), d = ระยะทางตั้งฉากจากจุดหมุนถึงแนวแรง (m)</p>
+      <div class="formula-box">เมื่อคานสมดุล: ผลรวมโมเมนต์ทวนเข็ม = ผลรวมโมเมนต์ตามเข็ม</div>
+    `
+  },
+  "sci-electric": {
+    subject: "science", title: "⚡ แม่เหล็กและไฟฟ้า",
+    html: `
+      <h2>สนามไฟฟ้าและแม่เหล็ก</h2>
+      <div class="formula-box">สนามไฟฟ้า (E) = F / q</div>
+      <div class="step-box">• ทิศทางของสนามไฟฟ้า: พุ่งออกจากประจุบวก และพุ่งเข้าหาประจุลบ<br>• เส้นสนามแม่เหล็กภายนอกแท่งแม่เหล็ก: พุ่งออกจากขั้วเหนือ (N) ไปยังขั้วใต้ (S)</div>
+    `
+  },
+  "health-sex": {
+    subject: "health", title: "❤️ เพศสัมพันธ์ในวัยเรียน",
+    html: `
+      <h2>การตัดสินใจและการป้องกัน</h2>
+      <p>เน้นหลักการยินยอมพร้อมใจ (Consent), ความปลอดภัย, การรับผิดชอบร่วมกัน และการป้องกันการตั้งครรภ์ไม่พร้อมรวมถึงโรคติดต่อทางเพศสัมพันธ์ (STIs)</p>
+      <div class="step-box">การใช้ถุงยางอนามัยอย่างถูกวิธีเป็นวิธีเดียวที่สามารถป้องกันได้ทั้งการตั้งครรภ์และโรคติดต่อทางเพศสัมพันธ์พร้อมกัน</div>
+    `
+  },
+  "health-service": {
+    subject: "health", title: "🏥 บริการทางสุขภาพ",
+    html: `
+      <h2>การเลือกใช้บริการทางสุขภาพ</h2>
+      <p>เข้าใจสิทธิขั้นพื้นฐาน หลักประกันสุขภาพถ้วนหน้า และการเลือกใช้บริการสถานพยาบาลให้เหมาะสมกับระดับอาการป่วย</p>
+    `
+  },
+  "health-tech": {
+    subject: "health", title: "📱 สุขภาพกับเทคโนโลยี",
+    html: `
+      <h2>การจัดสมดุลการใช้เทคโนโลยี</h2>
+      <p>ลดพฤติกรรมเนือยนิ่ง (Sedentary Behavior) บริหารเวลาหน้าจอ (Screen Time) และปรับสุขอนามัยการนอนหลับ</p>
+    `
+  },
+  "health-basket": {
+    subject: "health", title: "🏀 ประวัติบาสเกตบอล",
+    html: `
+      <h2>ประวัติและกติกาบาสเกตบอล</h2>
+      <p>คิดค้นโดย <b>ดร.เจมส์ ไนสมิธ (Dr. James Naismith)</b> ในปี ค.ศ. 1891 ที่ประเทศสหรัฐอเมริกา เพื่อเป็นกีฬาในร่มช่วงฤดูหนาว</p>
+    `
+  },
+  "social-map": {
+    subject: "social", title: "🧭 เครื่องมือทางภูมิศาสตร์",
+    html: `
+      <h2>การคำนวณมาตราส่วนแผนที่</h2>
+      <div class="formula-box">มาตราส่วน = ระยะทางบนแผนที่ ÷ ระยะทางจริง</div>
+      <div class="example-box">ตัวอย่าง: แผนที่มาตราส่วน 1 : 100,000 หากวัดระยะบนแผนที่ได้ 1 ซม. ระยะทางจริงคือ 100,000 ซม. = <span class="answer-text">1 กิโลเมตร</span></div>
+    `
+  },
+  "social-europe": {
+    subject: "social", title: "🇪🇺 ทวีปยุโรป",
+    html: `
+      <h2>ลักษณะทางกายภาพของยุโรป</h2>
+      <p>ทวีปยุโรปไม่มีเขตภูมิอากาศแบบแห้งแล้ง/ทะเลทราย มีชายฝั่งเว้าแหว่งมาก เหมาะแก่การเป็นท่าเรือธรรมชาติ</p>
+    `
+  },
+  "social-africa": {
+    subject: "social", title: "🌍 ทวีปแอฟริกา",
+    html: `
+      <h2>ลักษณะทางกายภาพของแอฟริกา</h2>
+      <p>มีแม่น้ำไนล์เป็นแม่น้ำที่ยาวที่สุดในโลก มีทะเลทรายซาฮาราอยู่ทางตอนเหนือ และมีพื้นที่ส่วนใหญ่เป็นที่ราบสูง</p>
+    `
+  },
+  "social-disaster": {
+    subject: "social", title: "🌪️ สิ่งแวดล้อมและภัยพิบัติ",
+    html: `
+      <h2>ภัยธรรมชาติและการรับมือ</h2>
+      <p>การแยกแยะระหว่างภัยธรรมชาติ (แผ่นดินไหว, สึนามิ, พายุ) กับปัญหาสิ่งแวดล้อมจากกิจกรรมมนุษย์ (ภาวะโลกร้อน, PM2.5)</p>
+    `
+  }
+};
+
+const quizQuestions = [
+  { cat: "คณิต", q: "จุด (2,3) สะท้อนข้ามแกน X จะได้จุดพิกัดใหม่คือข้อใด?", o: ["(2, -3)", "(-2, 3)", "(-2, -3)", "(3, 2)"], a: 0, e: "การสะท้อนข้ามแกน X ค่า x จะคงเดิม แต่ค่า y จะเปลี่ยนเครื่องหมายเป็นตรงข้าม" },
+  { cat: "คณิต", q: "ผลคูณของ 2³ × 2⁴ มีค่าตรงกับข้อใด?", o: ["2⁷", "2¹²", "4⁷", "2¹"], a: 0, e: "ฐานเหมือนกันคูณกัน นำเลขชี้กำลังมาบวกกัน (3 + 4 = 7)" },
+  { cat: "คณิต", q: "ผลบวกพหุนามอย่างง่ายของ 3x + 5x − 2 คือข้อใด?", o: ["8x − 2", "8x + 2", "6x − 2", "15x"], a: 0, e: "นำพจน์ที่คล้ายกันมารวมกัน: (3x + 5x) − 2 = 8x − 2" },
+  { cat: "วิทย์", q: "โครงสร้างใดทำหน้าที่เป็นหน่วยกรองปัสสาวะขั้นพื้นฐานของไต?", o: ["นิวรอน", "หน่วยไต (Nephron)", "ถุงลม", "เกล็ดเลือด"], a: 1, e: "Nephron (หน่วยไต) ทำหน้าที่กรองของเสียและปรับสมดุลสารในเลือด" },
+  { cat: "วิทย์", q: "วัตถุเคลื่อนที่ได้ระยะทาง 20 เมตร ในเวลา 4 วินาที อัตราเร็วเฉลี่ยมีค่าเท่าใด?", o: ["4 m/s", "5 m/s", "16 m/s", "80 m/s"], a: 1, e: "อัตราเร็ว = ระยะทาง ÷ เวลา = 20 ÷ 4 = 5 m/s" },
+  { cat: "วิทย์", q: "เมื่อความลึกของของเหลวเพิ่มขึ้น ความดันของของเหลวจะเปลี่ยนแปลงอย่างไร?", o: ["ลดลง", "เท่าเดิม", "เพิ่มขึ้น", "กลายเป็นศูนย์"], a: 2, e: "จากสูตร P = ρgh ความดันแปรผันตรงกับความลึก (h)" },
+  { cat: "วิทย์", q: "เส้นสนามไฟฟ้าที่เกิดจากประจุไฟฟ้าบวกมีทิศทางอย่างไร?", o: ["พุ่งเข้าหาประจุ", "พุ่งออกจากประจุ", "วนเป็นวงกลม", "ไม่มีทิศทาง"], a: 1, e: "เส้นสนามไฟฟ้าจากประจุบวกจะมีทิศพุ่งออกจากประจุเสมอ" },
+  { cat: "สุขศึกษา", q: "การตัดสินใจเรื่องเพศอย่างรับผิดชอบ ควรยึดถือหลักการใดเป็นสำคัญที่สุด?", o: ["ทำตามกลุ่มเพื่อน", "การยินยอมและความปลอดภัย", "ทำตามกระแสนิยม", "ความพึงพอใจชั่วคราว"], a: 1, e: "การยินยอม (Consent) ความปลอดภัย และผลกระทบที่ตามมาคือสิ่งสำคัญที่สุด" },
+  { cat: "สังคม", q: "ทิศทางใดอยู่ตรงข้ามกับทิศตะวันออก?", o: ["ทิศเหนือ", "ทิศใต้", "ทิศตะวันตก", "ทิศตะวันออกเฉียงเหนือ"], a: 2, e: "ทิศตะวันออก (East) อยู่ตรงข้ามกับทิศตะวันตก (West)" },
+  { cat: "สังคม", q: "แผนที่มาตราส่วน 1 : 100,000 ระยะทางบนแผนที่ 1 ซม. เท่ากับระยะทางจริงเท่าใด?", o: ["100 เมตร", "1 กิโลเมตร", "10 กิโลเมตร", "100 กิโลเมตร"], a: 1, e: "100,000 ซม. = 1,000 เมตร = 1 กิโลเมตร" }
+];
+
+/* =====================================================================
+   INTERACTION & NAVIGATION LOGIC
+   ===================================================================== */
+function switchTab(viewId, btnEl) {
+  const views = ['home-view', 'math-view', 'science-view', 'health-view', 'social-view', 'topic-detail-view', 'quiz-view'];
+  views.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  });
+
+  const target = document.getElementById(viewId + '-view');
+  if (target) target.classList.remove('hidden');
+
+  if (btnEl) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btnEl.classList.add('active');
+  }
+
+  if (viewId === 'quiz') generateQuizSet();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function openSubject(subjectId) {
+  gameState.currentSubject = subjectId;
+  switchTab(subjectId);
+}
+
+function openTopic(topicId) {
+  const data = topicData[topicId];
+  if (!data) return;
+  
+  document.getElementById('topic-content-body').innerHTML = `
+    <span class="pill" style="margin-bottom:12px;">${data.subject.toUpperCase()}</span>
+    ${data.html}
+  `;
+  
+  const views = ['home-view', 'math-view', 'science-view', 'health-view', 'social-view', 'quiz-view'];
+  views.forEach(id => document.getElementById(id).classList.add('hidden'));
+  document.getElementById('topic-detail-view').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function backToSubject() {
+  switchTab(gameState.currentSubject || 'home');
+}
+
+function triggerSpark(x, y, text) {
+  const layer = document.getElementById('fx-layer');
+  const spark = document.createElement('div');
+  spark.className = 'floating-spark';
+  spark.innerText = text;
+  spark.style.left = `${x}px`;
+  spark.style.top = `${y}px`;
+  spark.style.color = text.includes('+') ? '#16a34a' : '#e11d48';
+  layer.appendChild(spark);
+  setTimeout(() => spark.remove(), 1200);
+}
+
+function addEXP(amount, event) {
+  gameState.exp += amount;
+  document.getElementById('exp-val').innerText = `${gameState.exp} PTS`;
+  
+  // Level Calculation
+  let lvl = Math.floor(gameState.exp / 50) + 1;
+  document.getElementById('game-level').innerText = `⭐ Lv.${lvl} Scholar`;
+
+  if (event) {
+    triggerSpark(event.clientX, event.clientY, `+${amount} EXP`);
+  }
+}
+
+function checkMini(btn, isCorrect) {
+  if (btn.dataset.done) return;
+  btn.dataset.done = "1";
+  
+  if (isCorrect) {
+    btn.style.borderColor = "#22c55e";
+    btn.style.background = "#dcfce7";
+    btn.innerText += "  ✅ ถูกต้อง!";
+    addEXP(10, window.event);
+  } else {
+    btn.style.borderColor = "#f43f5e";
+    btn.style.background = "#ffe4e6";
+    btn.innerText += "  ❌ ยังไม่ถูกต้อง";
+  }
+}
+
+/* =====================================================================
+   QUIZ SYSTEM
+   ===================================================================== */
+function generateQuizSet() {
+  const container = document.getElementById('quiz-container');
+  document.getElementById('quiz-score-board').innerText = '';
+  
+  let shuffled = [...quizQuestions].sort(() => Math.random() - 0.5);
+  container.innerHTML = shuffled.map((q, idx) => `
+    <div class="quiz-card" data-qidx="${idx}">
+      <span class="pill">${q.cat}</span>
+      <p>${idx + 1}. ${q.q}</p>
+      <div>
+        ${q.o.map((opt, oIdx) => `
+          <button class="opt-btn" onclick="answerQuiz(this, ${oIdx === q.a}, '${q.e.replace(/'/g, "\\'")}')">
+            ${String.fromCharCode(65 + oIdx)}.${opt}
+          </button>
+        `).join('')}
+      </div>
+      <div class="explain-text hidden"></div>
+    </div>
+  `).join('');
+}
+
+function answerQuiz(btn, isCorrect, explain) {
+  const card = btn.closest('.quiz-card');
+  if (card.dataset.answered) return;
+  card.dataset.answered = "1";
+
+  const allBtns = card.querySelectorAll('.opt-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  const explainEl = card.querySelector('.explain-text');
+  explainEl.classList.remove('hidden');
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    explainEl.innerHTML = `✅ <b>ถูกต้อง!</b> ${explain}`;
+    gameState.correct++;
+    gameState.streak++;
+    document.getElementById('correct-val').innerText = `${gameState.correct} ข้อ`;
+    document.getElementById('streak-val').innerText = `${gameState.streak}x`;
+    addEXP(20, window.event);
+  } else {
+    btn.classList.add('wrong');
+    explainEl.innerHTML = `❌ <b>ยังไม่ถูกต้อง:</b> ${explain}`;
+    gameState.streak = 0;
+    document.getElementById('streak-val').innerText = `0x`;
+  }
+}
+</script>
+</body>
+</html>
