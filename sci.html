@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบวิทยาศาสตร์ ปลายภาค (30 ข้อ)</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+            --correct: #10b981;
+            --incorrect: #ef4444;
+        }
+
+        body {
+            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        h1 { margin: 0 0 8px 0; color: var(--primary); }
+
+        .quiz-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+
+        .question-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: #fff;
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .option-btn.selected {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .option-btn.correct {
+            background-color: #d1fae5 !important;
+            border-color: var(--correct) !important;
+            color: #065f46;
+        }
+
+        .option-btn.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: var(--incorrect) !important;
+            color: #991b1b;
+        }
+
+        .explanation {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f8fafc;
+            border-left: 4px solid var(--primary);
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .submit-btn:hover { background: var(--primary-hover); }
+
+        .result-box {
+            display: none;
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>แบบทดสอบก่อนเรียน วิทยาศาสตร์ ปลายภาค</h1>
+        <p>ครอบคลุม: ระบบร่างกาย, ระบบประสาท, สืบพันธุ์, ฮอร์โมน, แรง, โมเมนต์, และแม่เหล็กไฟฟ้า</p>
+    </header>
+
+    <div id="result-box" class="result-box">
+        <h2>ผลคะแนนของคุณ</h2>
+        <p id="score-text" style="font-size: 1.5rem; font-weight: bold; color: var(--primary);"></p>
+    </div>
+
+    <form id="quiz-form">
+        <div id="quiz-container"></div>
+        <div class="actions">
+            <button type="button" class="submit-btn" onclick="submitQuiz()">ส่งคำตอบและตรวจคะแนน</button>
+        </div>
+    </form>
+</div>
+
+<script>
+const questions = [
+    {
+        q: "1. ข้อใดคือของเสียที่เป็นสารประกอบไนโตรเจน ซึ่งขับถ่ายออกทางระบบปัสสาวะของมนุษย์?",
+        options: ["ก. คาร์บอนไดออกไซด์", "ข. ยูเรีย", "ค. กรดยูริกในรูปผลึก", "ง. อุจจาระ"],
+        answer: 1,
+        exp: "มนุษย์ขับถ่ายของเสียประเภทไนโตรเจนในรูปของ 'ยูเรีย' ผ่านทางปัสสาวะ"
+    },
+    {
+        q: "2. ในภาวะปกติของคนสุขภาพดี สารในข้อใดที่ไม่ควรตรวจพบในปัสสาวะ?",
+        options: ["ก. น้ำ", "ข. ยูเรีย", "ค. กลูโคส", "ง. โซเดียม"],
+        answer: 2,
+        exp: "กลูโคสจะถูกดูดซับกลับทั้งหมดที่ท่อขดส่วนต้น หากพบกลูโคสในปัสสาวะแสดงว่าอาจเป็นโรคเบาหวาน"
+    },
+    {
+        q: "3. การกรองสารในหน่วยไตเกิดขึ้นที่บริเวณใด?",
+        options: ["ก. ท่อขดส่วนต้น", "ข. โกลเมอรูลัส และ โบว์แมนส์แคปซูล", "ค. ห่วงเฮนเล", "ง. ท่อรวม"],
+        answer: 1,
+        exp: "การกรองแรงดันสูงเกิดขึ้นที่กลุ่มหลอดเลือดฝอยโกลเมอรูลัส ผ่านเข้าสู่โบว์แมนส์แคปซูล"
+    },
+    {
+        q: "4. เนื้อไตส่วนนอก (Cortex) มีองค์ประกอบหลักของหน่วยไตชนิดใดประจำเป็นส่วนใหญ่?",
+        options: ["ก. ห่วงเฮนเล", "ข. ท่อรวม", "ค. โกลเมอรูลัส และ โบว์แมนส์แคปซูล", "ง. กรวยไต"],
+        answer: 2,
+        exp: "เนื้อไตส่วนนอกเป็นที่อยู่ของโกลเมอรูลัส, โบว์แมนส์แคปซูล และท่อขดส่วนต้น/ปลาย"
+    },
+    {
+        q: "5. ไตของมนุษย์ตั้งอยู่บริเวณใดของร่างกาย?",
+        options: ["ก. ในช่องอก หลังกระดูกอก", "ข. ด้านหลังของช่องท้อง บริเวณระดับเอว ทั้งสองข้าง", "ค. ในช่องท้องด้านหน้า ติดกับสะดือ", "ง. ใต้กะบังลมด้านขวาข้างเดียว"],
+        answer: 1,
+        exp: "ไตมี 1 คู่ อยู่ด้านหลังของช่องท้อง (Retroperitoneal) บริเวณบั้นเอวทั้งสองข้างของกระดูกสันหลัง"
+    },
+    {
+        q: "6. การกระตุกขาเมื่อโดนเคาะที่หัวเข่า (Knee-jerk reflex) สั่งการผ่านศูนย์ควบคุมใด?",
+        options: ["ก. เซรีบรัม", "ข. เซรีเบลลัม", "ค. ไขสันหลัง", "ง. เมดัลลา ออบลองกาตา"],
+        answer: 2,
+        exp: "กริยารีเฟลกซ์เป็นการตอบสนองแบบฉับพลันที่ควบคุมโดย 'ไขสันหลัง' โดยไม่ต้องผ่านสมองส่วนหน้า"
+    },
+    {
+        q: "7. สมองส่วน 'เซรีเบลลัม' (Cerebellum) มีหน้าที่หลักตามข้อใด?",
+        options: ["ก. ควบคุมความคิด ความจำ และการเรียนรู้", "ข. ควบคุมการทรงตัวและการประสานงานของกล้ามเนื้อ", "ค. ควบคุมการหายใจและการเต้นของหัวใจ", "ง. เป็นศูนย์รับความรู้สึกเจ็บปวด"],
+        answer: 1,
+        exp: "เซรีเบลลัมทำหน้าที่ควบคุมระบบกล้ามเนื้อและการทรงตัวของร่างกาย"
+    },
+    {
+        q: "8. แอกซอน (Axon) ในเซลล์ประสาท มีหน้าที่แตกต่างจากเดนไดรต์ (Dendrite) อย่างไร?",
+        options: ["ก. แอกซอนนำกระแสประสาทเข้าหาตัวเซลล์", "ข. แอกซอนนำกระแสประสาทออกจากตัวเซลล์", "ค. แอกซอนทำหน้าที่สร้างสารสื่อประสาทเท่านั้น", "ง. แอกซอนไม่มีเยื่อหุ้มไมอีลิน"],
+        answer: 1,
+        exp: "เดนไดรต์นำกระแสประสาท 'เข้า' สู่ตัวเซลล์ ส่วนแอกซอนนำกระแสประสาท 'ออก' จากตัวเซลล์"
+    },
+    {
+        q: "9. เซลล์สืบพันธุ์ชายและหญิงที่สมบูรณ์มีจำนวนโครโมโซมเท่าใด?",
+        options: ["ก. 46 แท่ง (2n)", "ข. 23 แท่ง (n)", "ค. 23 คู่", "ง. 44 แท่ง"],
+        answer: 1,
+        exp: "เซลล์สืบพันธุ์ (อสุจิและไข่) มีจำนวนโครโมโซมลดลงครึ่งหนึ่งคือ แฮพลอยด์ (n = 23 แท่ง)"
+    },
+    {
+        q: "10. ต่อมใต้สมองส่วนหน้า ทำหน้าที่ผลิตฮอร์โมนที่สำคัญข้อใด?",
+        options: ["ก. อินซูลิน", "ข. โกรทฮอร์โมน (GH) และ FSH/LH", "ค. อะดรีนาลิน", "ง. เมลาโทนิน"],
+        answer: 1,
+        exp: "ต่อมใต้สมองส่วนหน้าหลั่ง Growth Hormone รวมถึง FSH และ LH ที่กระตุ้นต่อมเพศ"
+    },
+    {
+        q: "11. ฮอร์โมนเพศชายที่สำคัญที่สุดคือข้อใด และสร้างจากเซลล์ใด?",
+        options: ["ก. เอสโตรเจน จาก Sertoli cell", "ข. เทสโทสเทอโรน จาก Leydig cell", "ค. โพรเจสเทอโรน จาก Prostate gland", "ง. FSH จาก ตับอ่อน"],
+        answer: 1,
+        exp: "Testosterone เป็นฮอร์โมนเพศชายหลัก สร้างจาก Leydig cells ในอัณฑะ"
+    },
+    {
+        q: "12. ส่วนโครงสร้างใดของอสุจิที่มีไมโทคอนเดรียจำนวนมากเพื่อสร้างพลังงานในการว่ายน้ำ?",
+        options: ["ก. ส่วนหัว (Head)", "ข. อะโครโซม (Acrosome)", "ค. ส่วนกลาง (Middle piece)", "ง. ส่วนหาง (Tail)"],
+        answer: 2,
+        exp: "ส่วนกลาง (Middle piece) บรรจุไมโทคอนเดรียผลิต ATP ให้หางใช้ในการเคลื่อนที่"
+    },
+    {
+        q: "13. การตกไข่ (Ovulation) มักเกิดขึ้นในช่วงใดของรอบประจำเดือน 28 วัน?",
+        options: ["ก. วันที่ 1-5", "ข. วันที่ 14", "ค. วันที่ 21", "ง. วันที่ 28"],
+        answer: 1,
+        exp: "การตกไข่มักเกิดขึ้นในวันที่ 14 ของรอบประจำเดือนเมื่อระดับฮอร์โมน LH พุ่งสูงขึ้นสูงสุด (LH surge)"
+    },
+    {
+        q: "14. แรงสองแรง ขนาด 5 นิวตัน และ 12 นิวตัน กระทำต่อวัตถุชิ้นเดียวกันในทิศทางตรงกันข้าม แรงลัพธ์จะมีขนาดเท่าใด?",
+        options: ["ก. 17 นิวตัน", "ข. 7 นิวตัน", "ค. 60 นิวตัน", "ง. 0 นิวตัน"],
+        answer: 1,
+        exp: "แรงตรงข้ามกันให้นำมาลบกัน: 12 N - 5 N = 7 N ไปทางทิศของแรงที่มากกว่า"
+    },
+    {
+        q: "15. ข้อใดจัดเป็น 'ปริมาณเวกเตอร์' ทั้งหมด?",
+        options: ["ก. ระยะทาง, อัตราเร็ว, มวล", "ข. การกระจัด, ความเร็ว, แรง", "ค. เวลา, พลังงาน, ความเร็ว", "ง. อุณหภูมิ, พื้นที่, ปริมาตร"],
+        answer: 1,
+        exp: "ปริมาณเวกเตอร์คือปริมาณที่ต้องบอกทั้ง 'ขนาด' และ 'ทิศทาง' ได้แก่ การกระจัด, ความเร็ว, แรง"
+    },
+    {
+        q: "16. แรงพยุง (Buoyant force) ของของเหลว มีขนาดเท่ากับข้อใดตามหลักของอาร์คิมีดีส?",
+        options: ["ก. น้ำหนักของวัตถุทั้งหมด", "ข. น้ำหนักของของเหลวที่มีปริมาตรเท่ากับส่วนที่ถูกแทนที่", "ค. ความหนาแน่นของวัตถุ คูณ ปริมาตรวัตถุ", "ง. แรงดันที่ก้นภาชนะ"],
+        answer: 1,
+        exp: "หลักของอาร์คิมีดีสกล่าวว่า แรงพยุง = น้ำหนักของของเหลวที่ถูกวัตถุนั้นแทนที่"
+    },
+    {
+        q: "17. ข้อใดอธิบายเกี่ยวกับ 'แรงกิริยาและแรงปฏิกิริยา' (กฎข้อที่ 3 ของนิวตัน) ได้ถูกต้อง?",
+        options: ["ก. มีขนาดเท่ากัน ทิศทางเดียวกัน และหักล้างกันหมดพอดี", "ข. เกิดบนวัตถุชิ้นเดียวกันเสมอ", "ค. มีขนาดเท่ากัน ทิศทางตรงกันข้าม และกระทำต่อวัตถุคนละก้อน", "ง. แรงกิริยาเกิดขึ้นก่อนแรงปฏิกิริยาเสมอ"],
+        answer: 2,
+        exp: "Action-Reaction มีขนาดเท่ากัน ทิศตรงข้าม แต่กระทำต่อวัตถุคนละก้อนจึงไม่หักล้างกัน"
+    },
+    {
+        q: "18. วัตถุมวล 10 kg วางบนพื้นระนาบที่มีค่าสัมประสิทธิ์ความเสียดทานทานมัดทาน ($\mu$) = 0.3 จงหาแรงเสียดทานจลน์ ($g = 10 m/s^2$)?",
+        options: ["ก. 3 นิวตัน", "ข. 30 นิวตัน", "ค. 100 นิวตัน", "ง. 300 นิวตัน"],
+        answer: 1,
+        exp: "สูตร $F = \mu N = \mu mg = 0.3 \times 10 \times 10 = 30$ นิวตัน"
+    },
+    {
+        q: "19. ปัจจัยใดที่มีผลต่อแรงดันของของเหลว ณ จุดใดจุดหนึ่ง?",
+        options: ["ก. รูปร่างของภาชนะ", "ข. ความลึกและความหนาแน่นของของเหลว", "ค. ปริมาตรรวมของของเหลวในภาชนะ", "ง. พื้นที่ผิวหน้าของของเหลว"],
+        answer: 1,
+        exp: "ความดันของเหลว $P = \rho g h$ ขึ้นอยู่กับความหนาแน่น ($\rho$) และระดับความลึก ($h$)"
+    },
+    {
+        q: "20. ชายคนหนึ่งเดินไปทางทิศเหนือ 4 เมตร แล้วเลี้ยวไปทางทิศตะวันออก 3 เมตร ข้อใดคือ 'ระยะทาง' และ 'การกระจัด'?",
+        options: ["ก. ระยะทาง 7 ม., การกระจัด 7 ม.", "ข. ระยะทาง 7 ม., การกระจัด 5 ม.", "ค. ระยะทาง 5 ม., การกระจัด 7 ม.", "ง. ระยะทาง 12 ม., การกระจัด 5 ม."],
+        answer: 1,
+        exp: "ระยะทาง = $4 + 3 = 7$ เมตร, การกระจัด (เส้นตรงจากจุดเริ่มต้น) = $\sqrt{4^2 + 3^2} = 5$ เมตร"
+    },
+    {
+        q: "21. โมเมนต์ของแรง (Moment of Force) มีสูตรคำนวณอย่างไร?",
+        options: ["ก. $M = F / d$", "ข. $M = F \times d$ (เมื่อ $d$ ตั้งฉากกับแนวแรง)", "ค. $M = m \times g$", "ง. $M = 1/2 \times m \times v^2$"],
+        answer: 1,
+        exp: "โมเมนต์ = แรง ($F$) $\times$ ระยะทางจากจุดหมุนไปตั้งฉากกับแนวแรง ($d$)"
+    },
+    {
+        q: "22. คานยาว 4 เมตร มีจุดหมุนอยู่ตรงกลาง ออกแรงกดทางซ้าย 20 นิวตัน จะต้องแขวนวัตถุทางขวาหนักเท่าใดคานจึงจะสมดุล ($M_{ทวน} = M_{ตาม}$)?",
+        options: ["ก. 10 นิวตัน", "ข. 20 นิวตัน", "ค. 40 นิวตัน", "ง. 80 นิวตัน"],
+        answer: 1,
+        exp: "จุดหมุนอยู่ตรงกลาง แขนคานสองข้างยาว 2 ม. เท่ากัน: $20 \times 2 = W \times 2 \rightarrow W = 20$ นิวตัน"
+    },
+    {
+        q: "23. เส้นแรงแม่เหล็กภายนอกแท่งแม่เหล็กมีทิศทางอย่างไร?",
+        options: ["ก. ออกจากขั้วใต้ ไป ขั้วเหนือ", "ข. ออกจากขั้วเหนือ ไป ขั้วใต้", "ค. พุ่งเข้าหาจุดศูนย์กลาง", "ง. ไม่มีทิศทางที่แน่นอน"],
+        answer: 1,
+        exp: "ภายนอกแท่งแม่เหล็ก เส้นแรงพุ่งออกจากขั้วเหนือ (N) ไปเข้าขั้วใต้ (S)"
+    },
+    {
+        q: "24. ทิศทางของ 'สนามไฟฟ้า' ณ จุดใดๆ กำหนดตามข้อใด?",
+        options: ["ก. ทิศทางของแรงที่กระทำต่อประจุลบ", "ข. ทิศทางของแรงที่กระทำต่อประจุบวกทดสอบ", "ค. พุ่งเข้าหาประจุบวกเสมอ", "ง. วนเป็นวงกลมรอบประจุ"],
+        answer: 1,
+        exp: "ทิศทางของสนามไฟฟ้าคือนิยามตามทิศทางของแรงที่กระทำต่อประจุบวกทดสอบ (+q)"
+    },
+    {
+        q: "25. หน่วยของสนามไฟฟ้าคือข้อใด?",
+        options: ["ก. นิวตัน (N)", "ข. คูลอมบ์ (C)", "ค. นิวตันต่อคูลอมบ์ (N/C)", "ง. โวลต์ (V)"],
+        answer: 2,
+        exp: "สนามไฟฟ้า $E = F/q$ มีหน่วยเป็น นิวตันต่อคูลอมบ์ (N/C) หรือ โวลต์ต่อเมตร (V/m)"
+    },
+    {
+        q: "26. ข้อใดถูกต้องเกี่ยวกับแรงระหว่างประจุไฟฟ้า?",
+        options: ["ก. ประจุชนิดเดียวกันดูดกัน ประจุต่างชนิดกันผลักกัน", "ข. ประจุชนิดเดียวกันผลักกัน ประจุต่างชนิดกันดูดกัน", "ค. ประจุบวกดูดประจุบวก", "ง. ประจุลบผลักประจุบวก"],
+        answer: 1,
+        exp: "ตามกฎของคูลอมบ์ ประจุชนิดเดียวกันจะผลักกัน ส่วนประจุต่างชนิดกันจะดูดกัน"
+    },
+    {
+        q: "27. ฮอร์โมนใดจากรังไข่ทำหน้าที่กระตุ้นให้ผนังมดลูกหนาตัวขึ้นเพื่อรองรับการฝังตัวของตัวอ่อน?",
+        options: ["ก. เทสโทสเทอโรน", "ข. เอสโตรเจน และ โพรเจสเทอโรน", "ค. อินซูลิน", "ง. ไทรอกซิน"],
+        answer: 1,
+        exp: "Estrogen และ Progesterone ช่วยกระตุ้นและรักษาความหนาของผนังมดลูก"
+    },
+    {
+        q: "28. อัตราเร็ว (Speed) ต่างจาก ความเร็ว (Velocity) อย่างไร?",
+        options: ["ก. อัตราเร็วเป็นเวกเตอร์ ความเร็วเป็นสเกลาร์", "ข. อัตราเร็วคิดจากระยะทาง ส่วนความเร็วคิดจากการกระจัด", "ค. มีหน่วยวัดคนละหน่วยกัน", "ง. ไม่มีความแตกต่างกัน"],
+        answer: 1,
+        exp: "อัตราเร็ว = ระยะทาง/เวลา (สเกลาร์), ความเร็ว = การกระจัด/เวลา (เวกเตอร์)"
+    },
+    {
+        q: "29. หากวัตถุลอยนิ่งอยู่ในน้ำ แสดงว่าแรงพยุงมีขนาดเท่าใด?",
+        options: ["ก. มากกว่าน้ำหนักวัตถุ", "ข. เท่ากับน้ำหนักของวัตถุ", "ค. น้อยกว่าน้ำหนักวัตถุ", "ง. เป็นศูนย์"],
+        answer: 1,
+        exp: "วัตถุสมดุลลอยนิ่งได้เมื่อ แรงพยุงขึ้น ($F_B$) = น้ำหนักวัตถุลง ($W$)"
+    },
+    {
+        q: "30. ศูนย์ควบคุมการเคี้ยว การกลืน การจาม และการหายใจ อยู่ที่สมองส่วนใด?",
+        options: ["ก. เซรีบรัม", "ข. ไฮโปทาลามาส", "ค. เมดัลลา ออบลองกาตา", "ง. เซรีเบลลัม"],
+        answer: 2,
+        exp: "Medulla oblongata ควบคุมระบบกึ่งนอกอำนาจจิตใจ เช่น การหายใจ การเต้นหัวใจ การกลืน สะอึก จาม"
+    }
+];
+
+function renderQuiz() {
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = '';
+
+    questions.forEach((q, idx) => {
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+        card.id = `q-card-${idx}`;
+
+        let optionsHTML = '';
+        q.options.forEach((opt, oIdx) => {
+            optionsHTML += `
+                <button type="button" class="option-btn" 
+                    onclick="selectOption(${idx}, ${oIdx})" 
+                    id="btn-${idx}-${oIdx}">
+                    ${opt}
+                </button>
+            `;
+        });
+
+        card.innerHTML = `
+            <div class="question-title">${q.q}</div>
+            <div class="options">${optionsHTML}</div>
+            <div class="explanation" id="exp-${idx}">
+                <strong>เฉลย:</strong> ${q.exp}
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+const userAnswers = {};
+
+function selectOption(qIdx, oIdx) {
+    userAnswers[qIdx] = oIdx;
+    const buttons = document.querySelectorAll(`#q-card-${qIdx} .option-btn`);
+    buttons.forEach(btn => btn.classList.remove('selected'));
+    document.getElementById(`btn-${qIdx}-${oIdx}`).classList.add('selected');
+}
+
+function submitQuiz() {
+    if (Object.keys(userAnswers).length < questions.length) {
+        if (!confirm("คุณยังตอบไม่ครบทุกข้อ ต้องการส่งคำตอบเลยหรือไม่?")) {
+            return;
+        }
+    }
+
+    let score = 0;
+
+    questions.forEach((q, idx) => {
+        const selected = userAnswers[idx];
+        const buttons = document.querySelectorAll(`#q-card-${idx} .option-btn`);
+        
+        buttons.forEach((btn, oIdx) => {
+            btn.disabled = true;
+            if (oIdx === q.answer) {
+                btn.classList.add('correct');
+            }
+            if (selected === oIdx && selected !== q.answer) {
+                btn.classList.add('incorrect');
+            }
+        });
+
+        if (selected === q.answer) {
+            score++;
+        }
+
+        document.getElementById(`exp-${idx}`).style.display = 'block';
+    });
+
+    const resultBox = document.getElementById('result-box');
+    const scoreText = document.getElementById('score-text');
+    scoreText.innerText = `คุณได้ ${score} / ${questions.length} คะแนน`;
+    resultBox.style.display = 'block';
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+renderQuiz();
+</script>
+
+</body>
+</html>
