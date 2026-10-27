@@ -100,7 +100,8 @@
 | 03-java-lab คอมไพล์และรันได้ | `javac -d out $(find src -name '*.java')` + `java -cp out ... Main` | คอมไพล์ผ่าน; เมนู 1–5 ทำงานครบ | ✅ |
 | 04-first-plugin build ได้จริง | `gradle build` | `BUILD SUCCESSFUL` → `build/libs/EclipseCore-1.0.0.jar` (มี plugin.yml + config.yml + 4 คลาส) | ✅ |
 | Gradle Wrapper ทำงาน | `./gradlew --version` | Gradle 9.8.2 บน JVM 25.0.5 | ✅ |
-| หน้าเว็บโหลดไฟล์ Markdown ได้ | เปิดผ่านเว็บเซิร์ฟเวอร์แล้วโหลด `Minecraft-MMO-Academy/README.md` | ต้องตรวจหลังเปิดพรีวิว | 🔍 ตรวจในขั้นถัดไป |
+| หน้าเว็บโหลดไฟล์ Markdown ได้ | `curl` ผ่าน Host header พรีวิว 10 path (หน้าแรก, CSS, JS, README, ROADMAP, แผน 365 วัน, บทเรียน Day 01) | ทุก path ได้ **200** และ path ที่ไม่มีจริงได้ **404** | ✅ |
+| ตัวแปลง Markdown ทำงานถูกต้องกับข้อมูลจริง | รัน `renderMarkdown()` กับ 4 ไฟล์ (365-DAY-PLAN, day-01, KNOWLEDGE-MAP, GLOSSARY) | ได้ heading/ตาราง/code/mermaid ครบ ไม่มี placeholder ค้าง | ✅ |
 | ปลั๊กอินโหลดบนเซิร์ฟเวอร์ Paper จริง | รัน `paper-26.3-*.jar` แล้วดู log | **ยังไม่ได้ทดสอบ** (เครื่องครูไม่มีไคลเอนต์เกม/RAM จำกัด) | ⏳ ผู้เรียนต้องทดสอบเอง (Month 5) |
 
 > 📌 หลักการที่ใช้: **เขียนเฉพาะสิ่งที่ทดสอบได้ และระบุสิ่งที่ยังไม่ได้ทดสอบให้ชัดเจน**
