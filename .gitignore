@@ -1,0 +1,40 @@
+# ===== ของที่สร้างจากการ build (Java / Gradle) =====
+build/
+out/
+target/
+.gradle/
+*.class
+*.jar
+!Minecraft-MMO-Academy/projects/**/gradle/wrapper/gradle-wrapper.jar
+
+# ===== เซิร์ฟเวอร์ Minecraft ที่รันในเครื่อง =====
+server/
+world/
+world_nether/
+world_the_end/
+logs/
+*.log
+*.log.gz
+crash-reports/
+libraries/
+versions/
+cache/
+eula.txt
+ops.json
+banned-*.json
+whitelist.json
+
+# ===== ความลับ (ห้ามขึ้น Git เด็ดขาด) =====
+.env
+.env.*
+*.env
+secrets/
+*.key
+*.pem
+
+# ===== Editor / OS =====
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+*~

@@ -1,0 +1,19 @@
+# config.yml — ไฟล์ตั้งค่าของ EclipseCore
+# ไฟล์นี้จะถูกคัดลอกไปไว้ที่ plugins/EclipseCore/config.yml เมื่อเปิดเซิร์ฟเวอร์ครั้งแรก
+# แก้ไฟล์นี้ในโปรเจกต์ = ค่าเริ่มต้นสำหรับผู้ใช้ใหม่
+# ถ้าต้องการค่าเริ่มต้นใหม่ทับไฟล์เดิม ให้ลบไฟล์ในเซิร์ฟเวอร์แล้วรีสตาร์ท
+
+# ข้อความต้อนรับเมื่อผู้เล่นเข้าเซิร์ฟเวอร์
+# รองรับ MiniMessage: <gold>, <bold>, <gradient:#ffcc00:#ff6600> เป็นต้น
+welcome-enabled: true
+welcome-message: "<gold><bold>ยินดีต้อนรับ</bold></gold> <gray>เข้าสู่ <aqua>Eclipse MMO RPG</aqua>, <white><player></white>!"
+
+# แสดงข้อความ farewell ตอนผู้เล่นออก
+farewell-enabled: false
+farewell-message: "<gray>ลาก่อน <white><player></white> — เจอกันใหม่!"
+
+# ระดับเลเวลสูงสุดของระบบ (ใช้ใน Month 8)
+max-level: 60
+
+# แสดงข้อความตัวอย่างให้ผู้เล่นใหม่เห็น
+show-tips: true

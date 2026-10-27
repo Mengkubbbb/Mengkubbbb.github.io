@@ -1,0 +1,23 @@
+# plugin.yml — บัตรประชาชนของปลั๊กอิน (ต้องอยู่ใน src/main/resources)
+# เอกสาร: https://docs.papermc.io/paper/dev/plugin-yml/
+name: EclipseCore
+version: 1.0.0
+main: com.mengkub.eclipse.EclipseCorePlugin
+description: ปลั๊กอินหลักของ Eclipse MMO RPG (หลักสูตร 365 วัน)
+author: Mengkub
+website: https://github.com/Mengkubbbb/Mengkubbbb.github.io
+# api-version: เวอร์ชัน Paper API ที่ปลั๊กอินนี้ใช้
+# ค่าที่ถูกต้อง (ตามเอกสาร ณ 2026-10-27) อยู่ระหว่าง 1.13 ถึง 26.3
+# ถ้าไม่ใส่ Paper จะโหลดเป็น legacy plugin และเตือนในคอนโซล
+api-version: '26.3'
+
+# ไม่ประกาศ commands: ที่นี่ เพราะเราลงทะเบียนคำสั่งในโค้ดด้วย Brigadier
+# (ถ้าประกาศทั้งสองที่ จะเกิดคำสั่งซ้ำและ error ตอนเปิดเซิร์ฟเวอร์)
+
+permissions:
+  eclipse.admin:
+    description: เข้าถึงคำสั่งแอดมินของ EclipseCore
+    default: op
+  eclipse.stats:
+    description: ดูสถิติของปลั๊กอิน
+    default: true
