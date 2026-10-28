@@ -34,6 +34,25 @@
 
 ---
 
+## 2.1 ปัญหา Paper / ปลั๊กอิน (จากการทดสอบจริง 28 ตุลาคม 2026)
+
+| อาการ | สาเหตุจริง | วิธีแก้ |
+| --- | --- | --- |
+| ดาวน์โหลด Paper ได้ HTTP **410 Gone** | PaperMC ปิด Downloads API v2 แล้ว | ใช้ fill v3: `https://fill.papermc.io/v3/projects/paper/versions/26.3/builds/226` แล้วดึง `downloads["server:default"].url` (ห้ามเดาชื่อไฟล์) |
+| เปิดเซิร์ฟเวอร์แล้วขึ้น `You need to agree to the EULA` | ยังไม่มี `eula.txt` หรือค่าเป็น `false` | อ่าน EULA ที่ https://aka.ms/MinecraftEULA แล้ว `echo "eula=true" > eula.txt` (เฉพาะเซิร์ฟเวอร์ส่วนตัว/ทดสอบ) |
+| `UnsupportedClassVersionError` หรือบูตไม่ขึ้น | ใช้ Java 21 กับ Paper 26.1+ | Paper 26.1+ ต้องการ **Java 25** — `java -version` ต้องเป็น 25.x |
+| `ERROR]: No key layers in MapLike[{}]` | ตั้ง `level-type=minecraft:flat` แต่ไม่ระบุ generator settings — เป็นข้อความของ worldgen ไม่ใช่ปลั๊กอิน | ไม่กระทบการโหลดปลั๊กอิน; ใช้โลกปกติหรือระบุ `generator-settings` ให้ครบ |
+| ปลั๊กอินไม่โหลด แต่ไม่มี error ชัด ๆ | `api-version` ใน `plugin.yml` ไม่ตรงกับเซิร์ฟเวอร์ หรือ `main:` ชี้คลาสผิด | ดู log ช่วง `Loading server plugin` → ต้องตรงกับ `api-version: '26.3'` และชื่อคลาสเต็ม |
+| ปลั๊กอินโหลดแต่ build ไม่ได้ | เรียก `Commands.literal(...)` ผ่านตัวแปร (static method ของ interface) | เรียกผ่านชื่อ interface: `Commands.literal(...)` — เจอจริงและแก้แล้ว |
+| `/eclipse` ใช้ไม่ได้ทั้งที่ปลั๊กอินโหลด | ลงทะเบียนคำสั่งใน `onEnable()` ไม่สำเร็จ หรือประกาศซ้ำใน `commands:` ของ `plugin.yml` | ใช้ Brigadier ผ่าน `LifecycleEvents.COMMANDS` ที่เดียว (อย่าประกาศทั้งสองที่) |
+| เซิร์ฟเวอร์กิน RAM จนเครื่องค้าง | `-Xmx` ตั้งชิด RAM ทั้งเครื่อง | ให้ heap ~50–60% ของ RAM ทั้งหมด เช่นเครื่อง 8 GB → `-Xmx4G` |
+| ปิดเซิร์ฟเวอร์ด้วย Ctrl+C แล้วโลกเสีย | ไม่ได้ใช้คำสั่ง `stop` | พิมพ์ `stop` ในคอนโซล (หรือ `screen`/`tmux` แล้วส่ง `stop`) เสมอ |
+
+> 🔎 **อ่าน log ให้เป็น:** `Loading server plugin X` = โหลดคลาส, `Enabling X` = `onEnable()` ทำงาน,
+> `Disabling X` = `onDisable()` ทำงาน — ถ้ามี Loading แต่ไม่มี Enabling แปลว่า `onEnable()` โยน exception
+
+---
+
 ## 3. ปัญหา Git
 
 | อาการ | สาเหตุ | วิธีแก้ |

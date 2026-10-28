@@ -51,7 +51,9 @@
 | ครูตรวจ | ปลั๊กอิน Paper (Month 5) | `gradle build` | BUILD SUCCESSFUL → `EclipseCore-1.0.0.jar` | ในไฟล์มี plugin.yml + 4 คลาส |
 | ครูตรวจ | Gradle Wrapper | `./gradlew --version` | Gradle 9.8.2 บน JVM 25.0.5 | — |
 | ครูตรวจ | หน้าเว็บหลักสูตร | `curl` ผ่าน Host header พรีวิว 10 path | ได้ 200 ทุกหน้า, path ที่ไม่มีจริงได้ 404 | PROJECT-STATUS.md ข้อ 6 |
-| ยังไม่ทดสอบ | โหลดปลั๊กอินบนเซิร์ฟเวอร์ Paper จริง | รัน `paper-26.3-*.jar` แล้วดู log | **ยังไม่ได้ทดสอบ** — ผู้เรียนต้องทำใน Month 5 | [tests/checklists/plugin-load.md](tests/checklists/plugin-load.md) |
+| ครูตรวจ (28 ต.ค. 2026) | โหลดปลั๊กอินบนเซิร์ฟเวอร์ Paper 26.3 จริง | `java -Xmx1024M -jar paper.jar --nogui` + ยิง `eclipse`, `eclipse hello Somchai`, `eclipse stats`, `plugins`, `stop` | `Paper 26.3-226-main@4f49049` บูต 16.1 วิ → `Enabling EclipseCore v1.0.0` → คำสั่งตอบถูกทุกตัว → ปิดสะอาด | [tests/runs/2026-10-28-plugin-load.md](tests/runs/2026-10-28-plugin-load.md) |
+| ครูตรวจ (28 ต.ค. 2026) | ดาวน์โหลด Paper API | `api.papermc.io/v2/...` → `410 Gone`; `fill.papermc.io/v3/projects/paper/versions/26.3/builds/226` → 200 | v2 เลิกใช้แล้ว ต้องใช้ fill v3 (อัปเดตเอกสารแล้ว) | [projects/05-paper-server/README.md](projects/05-paper-server/README.md) |
+| ยังไม่ทดสอบ | เข้าเล่นด้วยไคลเอนต์ Minecraft 26.3 | ต้องมีไคลเอนต์เกม | **ยังไม่ได้ทดสอบ** — ผู้เรียนต้องทำใน Month 5 | [tests/checklists/plugin-load.md](tests/checklists/plugin-load.md) ข้อ 9–10 |
 
 > 🛠️ กติกา: **ห้ามใส่ "ผ่าน" ถ้ายังไม่ได้รันจริง** ให้ใส่ผลลัพธ์ที่เห็นจริง รวมทั้งกรณีที่ยังไม่ผ่าน
 

@@ -17,6 +17,27 @@
 
 > ⚠️ **ห้ามใช้ build จากช่อง `EXPERIMENTAL` สำหรับเซิร์ฟเวอร์ที่ให้คนอื่นเล่น**
 
+### 1.1 วิธีดาวน์โหลดที่ใช้ได้จริง (ตรวจ 28 ตุลาคม 2026)
+
+> 🚨 **API v2 เลิกใช้แล้ว** — `https://api.papermc.io/v2/...` ตอบ **`410 Gone`**
+> ต้องใช้ **fill v3** และดึง URL จาก metadata (ห้ามเดาชื่อไฟล์)
+
+```bash
+# ดึง metadata ของ build ที่ต้องการ (เลือก channel = STABLE)
+curl -sS "https://fill.papermc.io/v3/projects/paper/versions/26.3/builds/226" -o meta.json
+
+# ดูว่า build นี้เป็นช่องอะไร + วันที่เผยแพร่
+python3 -c "import json;d=json.load(open('meta.json'));print(d['channel'], d['time'])"
+
+# ดึง URL จริงแล้วดาวน์โหลด
+URL=$(python3 -c "import json;print(json.load(open('meta.json'))['downloads']['server:default']['url'])")
+curl -L -o paper-26.3-226.jar "$URL"     # ขนาดจริงที่ตรวจ: 55,255,255 ไบต์
+unzip -t paper-26.3-226.jar | tail -1     # ต้องขึ้น "No errors detected"
+```
+
+**ผลจริงจากการทดสอบของครู (28 ต.ค. 2026):** `paper-26.3-226.jar` (ช่อง `STABLE`, เผยแพร่ 2026-10-26)
+บูตบน Java 25.0.5 ใน **16.1 วินาที** (โลก flat, ไม่มีผู้เล่น) → ดู [tests/runs/2026-10-28-plugin-load.md](../../tests/runs/2026-10-28-plugin-load.md)
+
 ---
 
 ## 2. วิธีเตรียมเซิร์ฟเวอร์ (ทำตามลำดับ)

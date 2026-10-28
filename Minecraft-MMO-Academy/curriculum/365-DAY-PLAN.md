@@ -33,13 +33,13 @@
 | 005 | 1 | Git และ Version Control สำหรับโปรเจกต์จริง | repo + commit แรก + `git log` มีหลักฐาน | [Day 05](month-01/day-05.md) | `NOT_STARTED` |
 | 006 | 1 | เริ่มคิดแบบโปรแกรมเมอร์: ผังงานและตรรกะ | `notes/loot-flow.md` ผังการสุ่มรางวัล | [Day 06](month-01/day-06.md) | `NOT_STARTED` |
 | 007 | 1 | 🔁 REVIEW สัปดาห์ 1 + รวม script ตรวจสอบเซิร์ฟเวอร์ | `scripts/server-check.sh` + คะแนนความเข้าใจ | [Day 07](month-01/day-07.md) | `REVIEW` |
-| 008 | 2 | Shell script: ตัวแปร, อาร์กิวเมนต์, อินพุตผู้ใช้ | `scripts/greet.sh` รับชื่อและแสดงผลได้ | — | `NOT_STARTED` |
-| 009 | 2 | Shell script: เงื่อนไข `if`, `case`, การตรวจสอบค่า | `scripts/check-price.sh` ตรวจค่าและเตือน | — | `NOT_STARTED` |
-| 010 | 2 | Shell script: ลูป `for`, `while` | `scripts/create-worlds.sh` สร้างหลายโฟลเดอร์ | — | `NOT_STARTED` |
-| 011 | 2 | Shell script: ฟังก์ชันและการคืนค่า | `scripts/lib.sh` ที่เรียกซ้ำได้จากไฟล์อื่น | — | `NOT_STARTED` |
-| 012 | 2 | ท่อคำสั่ง: `pipe`, `grep`, `sed`, `awk` เบื้องต้น | รายงานสรุปจากไฟล์ log ตัวอย่าง | — | `NOT_STARTED` |
-| 013 | 2 | สิทธิ์ไฟล์ละเอียด: `chmod`, `chown`, `umask` | ตารางทดลองสิทธิ์ 6 แบบ + ผลจริง | — | `NOT_STARTED` |
-| 014 | 2 | 🔁 REVIEW สัปดาห์ 2 | คะแนน + อัปเดต GLOSSARY/PROGRESS | — | `REVIEW` |
+| 008 | 2 | Shell script: ตัวแปร, อาร์กิวเมนต์, อินพุตผู้ใช้ | `scripts/greet.sh` รับชื่อและแสดงผลได้ | [Day 08](month-01/day-08.md) | `NOT_STARTED` |
+| 009 | 2 | Shell script: เงื่อนไข `if`, `case`, การตรวจสอบค่า | `scripts/check-price.sh` ตรวจค่าและเตือน | [Day 09](month-01/day-09.md) | `NOT_STARTED` |
+| 010 | 2 | Shell script: ลูป `for`, `while` | `scripts/create-worlds.sh` สร้างหลายโฟลเดอร์ | [Day 10](month-01/day-10.md) | `NOT_STARTED` |
+| 011 | 2 | Shell script: ฟังก์ชันและการคืนค่า | `scripts/lib.sh` ที่เรียกซ้ำได้จากไฟล์อื่น | [Day 11](month-01/day-11.md) | `NOT_STARTED` |
+| 012 | 2 | ท่อคำสั่ง: `pipe`, `grep`, `sed`, `awk` เบื้องต้น | รายงานสรุปจากไฟล์ log ตัวอย่าง | [Day 12](month-01/day-12.md) | `NOT_STARTED` |
+| 013 | 2 | สิทธิ์ไฟล์ละเอียด: `chmod`, `chown`, `umask` | ตารางทดลองสิทธิ์ 6 แบบ + ผลจริง | [Day 13](month-01/day-13.md) | `NOT_STARTED` |
+| 014 | 2 | 🔁 REVIEW สัปดาห์ 2 | คะแนน + อัปเดต GLOSSARY/PROGRESS | [Day 14](month-01/day-14.md) | `REVIEW` |
 | 015 | 3 | 😴 REST — พักตามแผน (อ่านเอกสาร Paper ได้ ไม่มีงานส่ง) | ไม่มีงานที่ต้องส่ง | — | `REST` |
 | 016 | 3 | ตั้ง VS Code เป็น workspace จริงของโปรเจกต์ | `.vscode/` + settings + task รัน script | — | `NOT_STARTED` |
 | 017 | 3 | SSH, กุญแจ และการเชื่อมต่อเครื่องอื่น | คีย์ SSH + ทดสอบเชื่อมต่อ (ถ้ามีเครื่องที่สอง) | — | `NOT_STARTED` |

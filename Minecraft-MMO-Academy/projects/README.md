@@ -14,7 +14,7 @@
 | 02 | [02-programming-lab](02-programming-lab/README.md) | Month 2 | shell script พื้นฐาน | ✅ ใช้งานได้ (ทดสอบแล้ว) |
 | 03 | [03-java-lab](03-java-lab/README.md) | Month 3–4 | JDK 25 | ✅ คอมไพล์และรันได้ (ทดสอบแล้ว) |
 | 04 | [04-first-plugin](04-first-plugin/README.md) | Month 5 | Java + Gradle | ✅ build ผ่าน ได้ไฟล์ .jar (ทดสอบแล้ว) |
-| 05 | [05-paper-server](05-paper-server/README.md) | Month 5–7 | ปลั๊กอิน v1 | 🔧 ไฟล์ตั้งค่า + script พร้อม (ยังไม่ได้ทดสอบรันเซิร์ฟเวอร์จริงในเครื่องครู) |
+| 05 | [05-paper-server](05-paper-server/README.md) | Month 5–7 | ปลั๊กอิน v1 | ✅ เปิดเซิร์ฟเวอร์ Paper 26.3 จริง + ปลั๊กอินโหลดได้ (ทดสอบ 28 ต.ค. 2026) |
 | 06 | [06-eclipse-core](06-eclipse-core/README.md) | Month 6–11 | ปลั๊กอิน v1 รันได้ | ⏳ ยังไม่เริ่ม (จะสร้างตาม Stage) |
 | 07 | [07-mmo-rpg](07-mmo-rpg/README.md) | Month 8–12 | EclipseCore Stage 1–4 | ⏳ ยังไม่เริ่ม (เป้าหมายระยะยาว) |
 
@@ -67,10 +67,14 @@
 | 04-first-plugin | `gradle build` | `BUILD SUCCESSFUL` → ได้ `build/libs/EclipseCore-1.0.0.jar` | ✅ ผ่าน |
 | 04-first-plugin | `unzip -l build/libs/EclipseCore-1.0.0.jar` | มี `plugin.yml`, `config.yml` และ `.class` ครบ 4 คลาส | ✅ ผ่าน |
 | 04-first-plugin | `./gradlew --version` (Gradle Wrapper) | Gradle 9.8.2 บน JVM 25.0.5 | ✅ ผ่าน |
-| 05-paper-server | `bash -n start.sh` + `./start.sh --test` | ไวยากรณ์ถูกต้อง; โหมด --test ตรวจจริงและคืน exit 1 เมื่อขาด Jar/Java | 🔧 ผ่านการตรวจสคริปต์ **แต่ยังไม่ได้เปิดเซิร์ฟเวอร์จริง** |
+| 05-paper-server | `bash -n start.sh` + `./start.sh --test` | ไวยากรณ์ถูกต้อง; โหมด --test ตรวจจริงและคืน exit 1 เมื่อขาด Jar/Java | ✅ ผ่าน |
+| 05-paper-server | ดาวน์โหลด Paper 26.3 build 226 (fill v3) แล้วเปิดเซิร์ฟเวอร์จริง | บูต 16.1 วินาที · `Paper 26.3-226-main@4f49049` · Java 25.0.5 | ✅ ผ่าน |
+| 04-first-plugin | ติดตั้ง `.jar` ลง `plugins/` แล้วเปิดเซิร์ฟเวอร์ | `Enabling EclipseCore v1.0.0` · `สวัสดี Somchai` · `/eclipse stats` = 0 ผู้เล่น | ✅ ผ่าน |
+| 05-paper-server | ปิดเซิร์ฟเวอร์ด้วยคำสั่ง `stop` ผ่านคอนโซล | `ปิด EclipseCore — เก็บกวาดเรียบร้อย` + RegionFile I/O halt สะอาด | ✅ ผ่าน |
 
-> ⚠️ **สิ่งที่ยังไม่ได้ทดสอบ:** การเปิดเซิร์ฟเวอร์ Paper จริง (ดาวน์โหลด paper-26.3, เข้าเล่นด้วยไคลเอนต์ Minecraft)
-> เครื่องทดสอบของครูไม่มีไคลเอนต์เกม และมี RAM จำกัด — **ผู้เรียนต้องทดสอบเอง** ตาม [tests/checklists/server-startup.md](../tests/checklists/server-startup.md) แล้วบันทึกผล
+> ✅ **อัปเดต 28 ตุลาคม 2026:** เปิดเซิร์ฟเวอร์ Paper 26.3 จริงแล้วและปลั๊กอินโหลดทำงาน (รายละเอียด: [tests/runs/2026-10-28-plugin-load.md](../tests/runs/2026-10-28-plugin-load.md))
+> ⚠️ **สิ่งที่ยังไม่ได้ทดสอบ:** การเข้าเล่นด้วย **ไคลเอนต์ Minecraft** (ข้อความต้อนรับ, Tab-completion, การปฏิเสธสิทธิ์ของผู้เล่น non-op)
+> เครื่องทดสอบของครูไม่มีไคลเอนต์เกม — **ผู้เรียนต้องทดสอบเอง** ตาม [tests/checklists/server-startup.md](../tests/checklists/server-startup.md) แล้วบันทึกผล
 
 ### ประวัติการแก้ที่พบระหว่างทดสอบ (บันทึกไว้เป็นบทเรียน)
 
@@ -79,3 +83,5 @@
 | `error: illegal static interface method call` 5 จุดใน `EclipseCommand.java` | เรียก `Commands.literal(...)` (static method ของ interface) ผ่านตัวแปร `commands` | เรียกผ่านชื่อ interface: `Commands.literal(...)` |
 | `./damage-sim.sh --rounds 3` รายงาน “ไม่จบเทิร์น 3” | ใช้ตัวแปร `--rounds` เป็นทั้งจำนวนรอบและเพดานเทิร์น | แยกเป็น `--rounds` (จำนวนรอบ) และ `--max-turns` (เพดานเทิร์น) |
 | สคริปต์จำลองการต่อสู้คืน `exit 1` เมื่อแพ้ | ใช้ exit code แทน “ผลลัพธ์ของเกม” | เก็บผลไว้ในตัวแปร `RESULT` และ exit 0 เมื่อจำลองสำเร็จ |
+| ดาวน์โหลด Paper จาก API v2 ได้ `410 Gone` | PaperMC ย้าย Downloads API ไป **fill v3** | ดึง URL จาก `fill.papermc.io/v3/projects/paper/versions/26.3/builds/226` → `downloads["server:default"].url` |
+| log มี `ERROR]: No key layers in MapLike[{}]` แต่ปลั๊กอินทำงานปกติ | มาจาก worldgen ของโลก flat ที่ไม่ได้ระบุ generator settings ไม่ใช่ปลั๊กอิน | ใช้โลกปกติหรือระบุ generator settings · เตือนไว้ใน TROUBLESHOOTING.md |
