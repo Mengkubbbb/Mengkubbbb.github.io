@@ -1,37 +1,21 @@
-# เดือนที่ 03 — Java Fundamentals
+# Month 03: Paper API Core (Events, Listeners, Player)
 
-**ช่วงวัน:** Day 061–090 · **บทเรียนละเอียด:** ⏳
+> เป้าหมาย: เรียนรู้ Event System ของ Paper/Bukkit และใช้งานได้จริง
+> ระยะเวลา: 30 วัน | ระดับ: กลาง
 
-## เป้าหมายของเดือน
-เขียน Java ได้เองตั้งแต่ Hello World ถึงคลาสที่มีหลายเมธอด คอมไพล์/รันจาก Terminal และด้วย Gradle ได้
-และเข้าใจว่า Java ทำงานบน JVM อย่างไร
+## โครงสร้าง
+| สัปดาห์ | เนื้อหา |
+| --- | --- |
+| สัปดาห์ 1 (Day 61–67) | Event System, Listener, @EventHandler |
+| สัปดาห์ 2 (Day 68–74) | Player Events (Join/Quit/Chat/Move) |
+| สัปดาห์ 3 (Day 75–81) | Block/Entity Events, Priority |
+| สัปดาห์ 4 (Day 82–88) | Custom logic + ยกเลิก event |
+| สัปดาห์ 5 (Day 89–90) | Mini Project |
 
-## สิ่งที่ต้องมีก่อนเริ่ม
-- ผ่านเกณฑ์ Month 2
-- JDK 25 ติดตั้งแล้ว (ตรวจด้วย `java -version` และ `javac -version`)
+## ผลลัพธ์
+- สร้าง Listener ได้เอง
+- จัดการ PlayerEvent ได้
+- เข้าใจ Event Priority/Cancelled
 
-## หัวข้อหลักในเดือนนี้
-1. JDK 25 กับความสัมพันธ์ของเวอร์ชัน (Minecraft 26.3 → Java 25)
-2. source → bytecode → JVM และคำสั่ง `javac`/`java`
-3. ตัวแปร ชนิดข้อมูล (primitive/reference) และการแปลงค่า
-4. ตัวดำเนินการ, `String`, การจัดรูปแบบข้อความ
-5. เงื่อนไข `if`/`else`/`switch`
-6. ลูป `for`/`while`, `break`/`continue`
-7. อาร์เรย์และ `ArrayList`
-8. เมธอด พารามิเตอร์ ค่า return
-9. คลาส/ออบเจกต์/คอนสตรัคเตอร์ และ `this`
-10. การเข้าถึง (public/private), `static`, `enum`, `HashMap`
-11. `try`/`catch` และการตรวจสอบข้อมูล
-12. แพ็กเกจ การแยกไฟล์ และ Gradle โปรเจกต์แรก
-
-## โปรเจกต์ประจำเดือน
-`projects/03-java-lab/` — ระบบไอเทมและตัวละครแบบข้อความ (สร้างไอเทม แสดงสถิติ คำนวณดาเมจ)
-
-## เกณฑ์ผ่านก่อนขึ้น Month 4
-- [ ] เขียนคลาสที่มีฟิลด์ private + getter/setter และเมธอดคำนวณเองได้
-- [ ] อธิบายได้ว่า `static` ต่างจาก instance อย่างไร พร้อมตัวอย่างจากโปรเจกต์
-- [ ] แก้ error คอมไพล์เองได้ (อ่านบรรทัดที่ error ระบุ)
-- [ ] รัน `./gradlew run` ให้โปรแกรมทำงานได้
-
-## คำเตือนของเดือนนี้
-> ⚠️ อย่าใช้ `public` ทุกฟิลด์เพราะ "มันง่ายกว่า" — Month 4 จะพังทั้งโปรเจกต์เมื่อระบบโตขึ้น
+## Progress
+- [ ] Month 3 เริ่มต้น

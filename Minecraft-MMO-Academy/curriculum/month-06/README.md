@@ -1,37 +1,13 @@
-# เดือนที่ 06 — Paper API: Events, Commands, Permissions และ Configuration
+# Month 06: Data Persistence (YAML, JSON, SQLite)
 
-**ช่วงวัน:** Day 151–180 · **บทเรียนละเอียด:** ⏳
+> เป้าหมาย: บันทึกข้อมูลผู้เล่นถาวร
+> ระยะเวลา: 30 วัน | ระดับ: กลาง–สูง
 
-## เป้าหมายของเดือน
-เขียนปลั๊กอินที่ "รู้จักผู้เล่น" ได้: รับ event, มีคำสั่งหลายชั้น, มีไฟล์ตั้งค่า, มี GUI
-และมีการจัดการสิทธิ์ที่ทดสอบแล้ว
+## เนื้อหา
+File Configuration, JSON (Gson), SQLite + JDBC, DataManager, Caching
 
-## สิ่งที่ต้องมีก่อนเริ่ม
-- ปลั๊กอิน v1 ติดตั้งและทำงานบนเซิร์ฟเวอร์ทดสอบได้ (Month 5)
-- เข้าใจ `plugin.yml` และวงจรชีวิตปลั๊กอิน
+## ผลลัพธ์
+ระบบ save/load ข้อมูลผู้เล่นทำงานได้
 
-## หัวข้อหลักในเดือนนี้
-1. Event Listener และ `@EventHandler` (ตัวอย่าง: ผู้เล่นเข้าเกม)
-2. Event priority, `ignoreCancelled`, event ที่ยกเลิกได้
-3. เก็บข้อมูลชั่วคราวใน memory (Map + UUID) และข้อควรระวังเมื่อผู้เล่นออก
-4. Scheduler: งานหน่วงเวลา/ทำซ้ำ + งาน async และสิ่งที่ห้ามทำใน async
-5. คำสั่ง: argument, tab-completion, subcommand
-6. ข้อความด้วย Adventure Component (สี, ตัวหนา, คลิกได้) + ไฟล์ภาษา
-7. `config.yml`: สร้างค่าเริ่มต้น, อ่าน/เขียนอย่างปลอดภัย
-8. Permission node และการทดสอบกับ LuckPerms
-9. GUI ด้วย Inventory + การป้องกันการย้ายไอเทม
-10. ItemStack + PersistentDataContainer (ไอเทมที่รู้จักตัวเอง)
-11. Sound/Particle/Title/BossBar และคูลดาวน์อย่างง่าย
-
-## โปรเจกต์ประจำเดือน
-`projects/05-paper-server/` + ปลั๊กอิน v2: ต้อนรับผู้เล่น, แสดงสถิติ, เมนู GUI, ไอเทมกำหนดเองชิ้นแรก
-
-## เกณฑ์ผ่านก่อนขึ้น Month 7
-- [ ] เขียน event listener ใหม่เองได้โดยเปิด Javadoc เอง (ไม่ต้องดูตัวอย่าง)
-- [ ] คำสั่งของตัวเองมี tab-completion และตรวจ permission
-- [ ] ปลั๊กอินสร้าง `config.yml` เองเมื่อรันครั้งแรก และไม่พังเมื่อค่าใน config ผิด
-- [ ] เมนู GUI เปิดได้และผู้เล่นเอาไอเทมออกจากเมนูไม่ได้
-
-## คำเตือนของเดือนนี้
-> ⚠️ ห้ามทำ DB query หรืออ่านไฟล์ใหญ่ใน main thread ของ event — เซิร์ฟเวอร์จะกระตุก (TPS ตก)
-> ⚠️ อย่าลืมยกเลิก task ใน `onDisable()` ไม่งั้นจะเกิด error ตอนปิดเซิร์ฟเวอร์
+## Progress
+- [ ] Month 6 เริ่มต้น
